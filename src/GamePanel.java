@@ -95,36 +95,7 @@ public class GamePanel extends JPanel{
         
         setConnectionElements();
         
-        ///TESTING
-        	BoardFields[0].addCard(8);
-        	BoardFields[0].openCard();
-        	
-        	BoardFields[5].addCard(10);
-        	BoardFields[5].openCard();
-        	
-        	MyDeck.addCard(6);
-        	for(int i=0;i<35;i++) {
-        		MyRejected.addCard(i);
-        	}
-        	
-        	OpponentsDeck.addCard(7);
-        	OpponentsRejected.addCard(58);
-        	
-        	MyHand.addCard(6);
-        	MyHand.addCard(19);
-        	MyHand.addCard(49);
-        	MyHand.addCard(68);
-        	MyHand.addCard(52);
-        	MyHand.addCard(66);
-        	MyHand.addCard(33);
-        	MyHand.addCard(45);
-        	MyHand.addCard(72);
-        	MyHand.addCard(3);
-        	MyHand.addCard(78);
-        	MyHand.addCard(9);
-        	
-        	Values.OpponentsHandSize = 5;
-        ///TESTING
+        prepareMyCards();
         
         timer = new Timer();
         timer.scheduleAtFixedRate(new ScheduleTask(), 0, Values.PERIOD);
@@ -139,6 +110,8 @@ public class GamePanel extends JPanel{
 	}
 	
 	private void prepareMyCards() {
+		
+		GameInfo.shuffleMyCards();
 		
 		for(int i=0;i<Values.MAX_DECK_CAPACITY-Values.HAND_START_VALUE;i++) {
 			MyDeck.addCard(GameInfo.MyCards[i]);
@@ -779,7 +752,6 @@ public class GamePanel extends JPanel{
 			myTextArea = myClient.getTextArea();
 		}
 	}
-	
 	
 	private void setConnectionElementsPositions() {
 		CloseConnectionButton.setBounds((int)Math.round(Values.DEFAULT_X*(0.87)), (int)Math.round(Values.DEFAULT_Y*(0.51)), (int)Math.round(Values.DEFAULT_X*(0.11)), (int)Math.round(Values.DEFAULT_Y*(0.03)));
@@ -1533,12 +1505,16 @@ public class GamePanel extends JPanel{
 				for(int i=0;i<8;i++) {
 					if((!BoardFields[4*i+2].isEmpty()) && x>BoardFields[4*i+2].returnX() && x<(BoardFields[4*i+2].returnX()+width) && y>BoardFields[4*i+2].returnY() && y<(BoardFields[4*i+2].returnY()+height)) {
 						runPopUpOnField(4*i+2, x, y, true, event);
+						break;
 					}else if((!BoardFields[4*i+3].isEmpty()) && x>BoardFields[4*i+3].returnX() && x<(BoardFields[4*i+3].returnX()+height) && y>BoardFields[4*i+3].returnY() && y<(BoardFields[4*i+3].returnY()+width)) {
 						runPopUpOnField(4*i+3, x, y, false, event);
+						break;
 					}else if((!BoardFields[4*i].isEmpty()) && x>BoardFields[4*i].returnX() && x<(BoardFields[4*i].returnX()+width) && y>BoardFields[4*i].returnY() && y<(BoardFields[4*i].returnY()+height)) {
 						runPopUpOnField(4*i, x, y, true, event);
+						break;
 					}else if((!BoardFields[4*i+1].isEmpty()) && x>BoardFields[4*i+1].returnX() && x<(BoardFields[4*i+1].returnX()+height) && y>BoardFields[4*i+1].returnY() && y<(BoardFields[4*i+1].returnY()+width)) {
 						runPopUpOnField(4*i+1, x, y, false, event);
+						break;
 					}
 				}
 			}
