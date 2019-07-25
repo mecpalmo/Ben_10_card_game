@@ -42,7 +42,7 @@ public class Hand {
 	}
 	
 	public void removeCard(int index) {
-		if(indexOfFocus==(Cards.size()-1)) {
+		if(indexOfFocus==(Cards.size()-1) && indexOfFocus>0) {
 			indexOfFocus--;
 		}
 		Cards.remove(index);
@@ -79,12 +79,13 @@ public class Hand {
 	}
 	
 	public void updateValues() {
+		if(Cards.size()==0) {
+			showing = false;
+		}else {
 		singleCardWidth = GameInfo.CardsLibrary[0].returnFrontImage().getWidth();
 		width = (int) ((Cards.size()-1)*backCardPart*singleCardWidth) + singleCardWidth;
 		StartX = (CurrentBoardWidth-width)/2;
 		focusedX = (int) (StartX + (indexOfFocus*singleCardWidth*backCardPart));
-		if(Cards.size()==0) {
-			showing = false;
 		}
 	}
 	
