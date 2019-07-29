@@ -5,8 +5,8 @@ public class Values {
 	public static int DEFAULT_Y = 720; // domyœlna wysokoœæ okna gry 1030 720
 	public static int SIZE_VALUE = 0;  // 0 - mniejszy; 1 - wiêkszy
 	public static final int CARDS_AMOUNT = 80; //liczba dostêpnych kart
-	public static final int MAX_DECK_CAPACITY = 40;
-	public static final int HAND_START_VALUE = 6;
+	public static final int MAX_DECK_CAPACITY = 40; //rozmiar talii
+	public static final int HAND_START_VALUE = 6; //pocz¹tkowa iloœæ kart na rêku
 	public static final int FIELDS_AMOUNT = 64;
 	public static final int PERIOD = 33;
 	public static final int SEVER_PERIOD = 1000;
@@ -30,7 +30,7 @@ public class Values {
 	public static int MyTransformationTime;
 	public static int MyLifeIndex;
 	
-	public static boolean HOST = false;
+	public static boolean HOST = true;
 	public static String IP_ADRESS = "127.0.0.1";
 	public static int PORT = 6789;
 	

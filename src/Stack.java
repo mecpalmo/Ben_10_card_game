@@ -104,10 +104,12 @@ public class Stack {
 	}
 	
 	public void updateFrontImage() {
-		if(RotateValue==180) {
-			TopImage = rotateImage(GameInfo.CardsLibrary[Cards.get(Cards.size()-1)].returnFrontImage(),RotateValue);
-		}else {
-			TopImage = GameInfo.CardsLibrary[Cards.get(Cards.size()-1)].returnFrontImage();
+		if(Cards.size()>0) {
+			if(RotateValue==180) {
+				TopImage = rotateImage(GameInfo.CardsLibrary[Cards.get(Cards.size()-1)].returnFrontImage(),RotateValue);
+			}else {
+				TopImage = GameInfo.CardsLibrary[Cards.get(Cards.size()-1)].returnFrontImage();
+			}
 		}
 	}
 	

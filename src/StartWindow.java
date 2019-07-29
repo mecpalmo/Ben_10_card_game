@@ -13,6 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+@SuppressWarnings("serial")
 public class StartWindow extends JFrame {
 
 	int size_x = 550;
@@ -131,23 +132,17 @@ public class StartWindow extends JFrame {
 	};
 	
 	private void startTheGame() {
-		
-		//okno ³adowania (ewentualne)
-		
-		//zamkniêcie menu
 		this.setVisible(false);
-		
-		//przetasowanie kart
-		GameInfo.shuffleMyCards();
-		
-		GameFrame myGameFrame = new GameFrame();
-		myGameFrame.setVisible(true);
+		CreatingGameWindow creatingGame = new CreatingGameWindow();
+		creatingGame.setVisible(true);
+		this.dispose();
 	}
 	
 	private void createDeck() {
 		this.setVisible(false);
-		CreatingDeckWindow myCreatingDeck = new CreatingDeckWindow(this);
+		CreatingDeckWindow myCreatingDeck = new CreatingDeckWindow();
 		myCreatingDeck.setVisible(true);
+		this.dispose();
 	}
 	
 }

@@ -34,6 +34,11 @@ public class RejectedViewer {
 		focusedX[0] = (int) (StartX + (indexOfFocus[0]*width*backCardPart()));
 		focusedX[1] = (int) (StartX + ((indexOfFocus[1]-SingleRowCapacity)*width*backCardPart()));
 		focusedX[2] = (int) (StartX + ((indexOfFocus[2]-SingleRowCapacity*2)*width*backCardPart()));
+		for(int i=0; i<3; i++) {
+			if(focusedX[i]<0) {
+				focusedX[i]=0;
+			}
+		}
 	}
 	
 	public int focusedX(int index) {

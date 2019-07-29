@@ -12,9 +12,13 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Formatter;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -22,6 +26,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -35,13 +40,10 @@ public class CreatingDeckWindow extends JFrame{
 	private AllCardsPanel myAllCardsPanel;
 	//private ButtonPanel myButtonPanel;
 	
-	private JFrame Menu;
-	
 	private int size_x, size_y;
 	
-	CreatingDeckWindow(JFrame menu){
+	CreatingDeckWindow(){
 		super("Ben 10 Karciana Gra Kolekcjonerska - mecpalmoGames");
-		Menu = menu;
 		this.setBackground(Color.GRAY);
 		
 		size_x = Values.DEFAULT_X;
@@ -55,6 +57,7 @@ public class CreatingDeckWindow extends JFrame{
 		
 		JScrollPane ScrollAllCards = new JScrollPane(myAllCardsPanel);
 		ScrollAllCards.setBounds(100,100,400,600);
+		ScrollAllCards.getVerticalScrollBar().setUnitIncrement(23);
 		add(ScrollAllCards);
 		
 		
@@ -105,6 +108,7 @@ public class CreatingDeckWindow extends JFrame{
 			setLabel();
 			setButtons();
 			setBigCardObject();
+			
 			readDeckFromFile();
 			
 			repaint();
@@ -171,18 +175,74 @@ public class CreatingDeckWindow extends JFrame{
 		
 		private void saveToFile() {
 			if(deckFields.size()==Values.MAX_DECK_CAPACITY) {
+				//String fileName = JOptionPane.showInputDialog("Podaj nazwê pliku do zapisu (bez rozszerzenia)");
 				
+				String fileName = "Deck\\Deck.txt";
+				String newline = System.getProperty("line.separator");
+				
+				try {
+					 Formatter myFormatter = new Formatter(fileName);
+					
+					for(int i=0;i<deckFields.size();i++) {
+					
+						String line = Integer.toString(deckFields.get(i).getCardID());
+						myFormatter.format(line);
+						if(i!=deckFields.size()-1) {
+						myFormatter.format(newline);
+						}
+						
+					}
+					
+					myFormatter.close();
+					
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+					JOptionPane.showMessageDialog(null, "B³¹d zapisu");
+				}
 			}
 		}
 		
 		private void readDeckFromFile() {
+			clearMyDeck();
+			String fileName = "Deck\\Deck.txt";
+			//fileName = JOptionPane.showInputDialog("Podaj nazwê pliku");
 			
+			BufferedReader reader;
+			FileReader feader;
+			int lines = 0;
+			try {
+				feader = new FileReader(fileName);
+				reader = new BufferedReader(feader);
+				for(int i=0; i<Values.MAX_DECK_CAPACITY; i++) {
+					String id = reader.readLine();
+					if(id == null) {
+						break;
+					}else {
+						System.out.println(id);
+						int ID = Integer.parseInt(id);
+						addCard(ID);
+					}
+				}
+				reader.close();
+				System.out.println("lines: "+lines);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(null, "B³¹d wczytywania");
+			} catch (IOException e) {
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(null, "B³¹d wczytywania");
+			}
+			
+			saveToGame();
+			updateFieldsLocations();
+			update();
 		}
 		
 		public void clearMyDeck() {
 			while(deckFields.size()>0) {
 				deckFields.remove(deckFields.size()-1);
 			}
+			update();
 		}
 		
 		private void addCard(int id) {
@@ -336,8 +396,6 @@ public class CreatingDeckWindow extends JFrame{
 			
 			private int OriginID;
 			private int CardID;
-			private int x;
-			private int y;
 			
 			
 			PopUpWindow(){
@@ -347,8 +405,6 @@ public class CreatingDeckWindow extends JFrame{
 				ShowCard.addActionListener(popList);
 				AddCard.addActionListener(popList);
 				RemoveCard.addActionListener(popList);
-				x = 0;
-				y = 0;
 				OriginID = 0;
 				CardID = 0;
 			}
@@ -369,8 +425,6 @@ public class CreatingDeckWindow extends JFrame{
 					RemoveCard.addActionListener(popList);
 					add(RemoveCard);
 				}
-				x = 0;
-				y = 0;
 				OriginID = 0;
 				CardID = 0;
 			}
@@ -383,14 +437,6 @@ public class CreatingDeckWindow extends JFrame{
 				CardID = id;
 			}
 			
-			public void setX(int _x) {
-				x = _x;
-			}
-			
-			public void setY(int _y) {
-				y = _y;
-			}
-			
 			private ActionListener popList = new ActionListener() {
 
 				@Override
@@ -398,6 +444,10 @@ public class CreatingDeckWindow extends JFrame{
 					if(arg0.getSource()==ShowCard) {
 						ShowBigCardObject.setImage(CardID);
 						ShowBigCardObject.setShowing(true);
+						repaint();
+						repaint();
+						repaint();
+						repaint();
 						repaint();
 					}
 					if(arg0.getSource()==AddCard) {
@@ -438,7 +488,8 @@ public class CreatingDeckWindow extends JFrame{
 	
 	private void returnToMenu() {
 		this.setVisible(false);
-		Menu.setVisible(true);
+		StartWindow newStart = new StartWindow();
+		newStart.setVisible(true);
 		this.dispose();
 	}
 	

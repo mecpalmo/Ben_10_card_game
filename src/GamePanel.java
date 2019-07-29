@@ -979,7 +979,7 @@ public class GamePanel extends JPanel{
 		}
 		
 		private void checkOpponentsRejected(MouseEvent event) {
-			if(event.getButton()==MouseEvent.BUTTON3) {
+			if(event.getButton()==MouseEvent.BUTTON3 && OpponentsRejected.size()>0) {
 				int x = event.getX();
 				int y = event.getY();
 				if(x>=OpponentsRejected.returnX() && x<=OpponentsRejected.returnX()+OpponentsRejected.returnStackImage().getWidth() && y>=OpponentsRejected.returnY() && y<=OpponentsRejected.returnY()+OpponentsRejected.returnStackImage().getHeight() ) {
