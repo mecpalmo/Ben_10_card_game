@@ -218,13 +218,11 @@ public class CreatingDeckWindow extends JFrame{
 					if(id == null) {
 						break;
 					}else {
-						System.out.println(id);
 						int ID = Integer.parseInt(id);
 						addCard(ID);
 					}
 				}
 				reader.close();
-				System.out.println("lines: "+lines);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 				JOptionPane.showMessageDialog(null, "B³¹d wczytywania");
