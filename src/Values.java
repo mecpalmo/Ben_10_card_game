@@ -1,15 +1,20 @@
 
 public class Values {
 	
-	public static int DEFAULT_X = 1080; // domyœlna szerokoœæ okna gry 1545 1080
-	public static int DEFAULT_Y = 720; // domyœlna wysokoœæ okna gry 1030 720
+	private static final int X_SIZE_BIG = 1545;
+	private static final int Y_SIZE_BIG = 1030;
+	private static final int X_SIZE_SMALL = 1080;
+	private static final int Y_SIZE_SMALL = 720;
+	
+	public static int DEFAULT_X = X_SIZE_SMALL; // domyœlna szerokoœæ okna gry 1545 1080
+	public static int DEFAULT_Y = Y_SIZE_SMALL; // domyœlna wysokoœæ okna gry 1030 720
 	public static int SIZE_VALUE = 0;  // 0 - mniejszy; 1 - wiêkszy
 	public static final int CARDS_AMOUNT = 80; //liczba dostêpnych kart
 	public static final int MAX_DECK_CAPACITY = 40; //rozmiar talii
 	public static final int HAND_START_VALUE = 6; //pocz¹tkowa iloœæ kart na rêku
-	public static final int FIELDS_AMOUNT = 64;
-	public static final int PERIOD = 33;
-	public static final int SEVER_PERIOD = 1000;
+	public static final int FIELDS_AMOUNT = 64; // liczba pól na planszy
+	public static final int PERIOD = 33; // czas odœwie¿ania ekranu gry [ms]
+	public static final int SEVER_PERIOD = 1000; // czas odœwie¿ania serwera [ms]
 	
 	public static final int BACK_CARD_INDEX = 98;
 	public static final int EMPTY_FIELD_INDEX = 99;
@@ -59,14 +64,24 @@ public class Values {
 	}
 	
 	public static void setBiggerScreen() {
-		DEFAULT_X = 1545;
-		DEFAULT_Y = 1030;
+		DEFAULT_X = X_SIZE_BIG;
+		DEFAULT_Y = Y_SIZE_BIG;
 		SIZE_VALUE = 1;
 	}
 	
 	public static void setSmallerScreen() {
-		DEFAULT_X = 1080;
-		DEFAULT_Y = 720;
+		DEFAULT_X = X_SIZE_SMALL;
+		DEFAULT_Y = Y_SIZE_SMALL;
 		SIZE_VALUE = 0;
+	}
+	
+	public static void changeScreenSize() {
+		if(DEFAULT_X == X_SIZE_SMALL) {
+			DEFAULT_X = X_SIZE_BIG;
+			DEFAULT_Y = Y_SIZE_BIG;
+		}else {
+			DEFAULT_X = X_SIZE_SMALL;
+			DEFAULT_Y = Y_SIZE_SMALL;
+		}
 	}
 }

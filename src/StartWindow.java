@@ -23,7 +23,6 @@ public class StartWindow extends JFrame {
 	int button_y = 30;
 	
 	StartPanel myStartPanel;
-	
 	JButton StartGame, PrepareDeck, ExitGame;
 	
 	StartWindow(){
@@ -35,17 +34,11 @@ public class StartWindow extends JFrame {
 		myStartPanel = new StartPanel();
 		this.add(myStartPanel);
 		
-		loadMyDeck();
+		GameInfo.loadDeckFromFile();
 		
 		//okno na œrodku ekranu
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
-	}
-	
-	private void loadMyDeck() {
-		
-		
-		
 	}
 	
 	private class StartPanel extends JPanel{
