@@ -51,9 +51,10 @@ public class CreatingDeckWindow extends JFrame{
 		temp.pack();
 		Insets insets = temp.getInsets();
 		temp = null;
-		this.setSize(insets.left + insets.right + size_x, insets.top + insets.bottom + size_y);
+		this.setSize(insets.left + size_x, insets.top + size_y);
 		setResizable(false);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.setAlwaysOnTop(true);
 		
 		myAllCardsPanel = new AllCardsPanel();
 		
@@ -125,29 +126,31 @@ public class CreatingDeckWindow extends JFrame{
 		
 		private void setLabel() {
 			label = new JLabel("Moja talia: ("+deckFields.size()+"/"+Values.MAX_DECK_CAPACITY+")");
-			Font myFont = new Font("Arial",Font.BOLD,(int)Math.round(size_x*(0.015)));
+			Font myFont = new Font("Arial",Font.BOLD,(int)Math.round(size_y*(0.025)));
 			label.setFont(myFont);
 			label.setBounds((int)(size_x*(1-RightPanelXRatio)), (int)(size_y*0.015), (int)(size_x*0.2), (int)(size_y*0.05));
 			this.add(label);
 		}
 
 		private void setButtons() {
-			Font font = new Font("Arial",Font.BOLD,(int)Math.round(size_x*(0.010)));
+			Font font = new Font("Arial",Font.BOLD,(int)Math.round(size_y*(0.02)));
+			int button_x = (int)(size_x*0.072);
+			int button_y = (int)(size_y*0.035);
 			
 			ReturnToMenu = new JButton("Cofnij");
-			ReturnToMenu.setBounds((int)(size_x*0.90),(int)(size_y*0.019),90,25);
+			ReturnToMenu.setBounds((int)(size_x*0.90),(int)(size_y*0.021),button_x,button_y);
 			ReturnToMenu.setFont(font);
 			ReturnToMenu.addActionListener(actList);
 			this.add(ReturnToMenu);
 			
 			ClearDeck = new JButton("Wyczyœæ");
-			ClearDeck.setBounds((int)(size_x*0.82),(int)(size_y*0.019),90,25);
+			ClearDeck.setBounds((int)(size_x*0.82),(int)(size_y*0.021),button_x,button_y);
 			ClearDeck.setFont(font);
 			ClearDeck.addActionListener(actList);
 			this.add(ClearDeck);
 			
 			SaveDeck = new JButton("Zapisz");
-			SaveDeck.setBounds((int)(size_x*0.74),(int)(size_y*0.019),90,25);
+			SaveDeck.setBounds((int)(size_x*0.74),(int)(size_y*0.021),button_x,button_y);
 			SaveDeck.setFont(font);
 			SaveDeck.addActionListener(actList);
 			this.add(SaveDeck);

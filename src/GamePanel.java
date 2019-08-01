@@ -3,6 +3,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,36 +31,32 @@ public class GamePanel extends JPanel{
 	private BufferedImage Board, CurrentBoard, Background, CurrentBackground;
 	private Timer timer, timer2;
 	private Graphics2D g2d;
-	private float BoardRatio, BackgroundRatio;
-	private int shift, TransformationTime = 0;
+	private int TransformationTime = 0;
 	private Field[] BoardFields = new Field[Values.FIELDS_AMOUNT];
 	private Stack MyDeck, MyRejected, OpponentsDeck, OpponentsRejected;
 	private Hand MyHand;
 	private LifeMeter MyLife, OpponentsLife;
-	private JLabel MyStackInfo, MyTransformationInfo, OpponentsStackInfo, OpponentsTransformationInfo;
-	private JButton AddingTransTime, DecreasingTransTime, ResizeButton;
+	private JLabel MyStackInfo, MyTransformationInfo, OpponentsStackInfo, OpponentsTransformationInfo, MyTransformationValue, OpponentsTransformationValue;
+	private JButton AddingTransTime, DecreasingTransTime, ResizeButton, ResetConnectionButton, CloseConnectionButton;
 	private Hover HoverObject;
-	private JFrame upperFrame; //no ja nie wiem czy tak powinno byæ
+	private JFrame upperFrame;
 	private ShowBigCard ShowBigCardObject;
 	private RejectedViewer RejectedViewerObject;
 	private Server myServer;
 	private Client myClient;
 	private JScrollPane myScrollPane;
 	private JTextArea myTextArea;
-	private JButton ResetConnectionButton, CloseConnectionButton;
 	
 	
 	GamePanel(JFrame GameFrame){
 		
-		upperFrame = GameFrame; //no ja nie wiem czy tak powinno byæ
+		upperFrame = GameFrame;
 		setSize(Values.DEFAULT_X,Values.DEFAULT_Y);
 		setLayout(null);
 		loadImage();
 		loadBackground();
-		BoardRatio = (float)Board.getHeight()/(float)Board.getWidth();
-		CurrentBoard = resizeBoard(Board,Values.DEFAULT_X,Values.DEFAULT_Y);
-		BackgroundRatio = (float)Board.getHeight()/(float)Board.getWidth();
-		CurrentBackground = resizeBackground(Background,Values.DEFAULT_X,Values.DEFAULT_Y);
+		CurrentBoard = resizeImage(Board,Values.DEFAULT_X,Values.DEFAULT_Y);
+		CurrentBackground = resizeImage(Background,Values.DEFAULT_X,Values.DEFAULT_Y);
 		setBackground(Color.BLACK);
 		setFields();
 		setStacks();
@@ -70,42 +67,46 @@ public class GamePanel extends JPanel{
 		setHoverObject();
 		setBigCardObject();
 		setRejectedViewer();
-        
-		//prepareMyCards();
+		
+		Values.resetOpponentsData();
+		Values.resetMyData();
 		
         if(Values.HOST) {
         	myServer = new Server();
         }else {
         	myClient = new Client(Values.IP_ADRESS);
         }
-        
         Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
 				if(Values.HOST) {
 					myServer.startRunning();
 				}else {
 					myClient.StartRunning();
 				}
 			}
-			
 		});
-        t.start();
-        
+        //t.start();
         setConnectionElements();
-        
-        prepareMyCards();
+        //prepareMyCards();
         
         timer = new Timer();
         timer.scheduleAtFixedRate(new ScheduleTask(), 0, Values.PERIOD);
         
-        timer2 = new Timer();
-        timer2.scheduleAtFixedRate(new ScheduleTask2(), 0, Values.SEVER_PERIOD);
-        
+        //timer2 = new Timer();
+        //timer2.scheduleAtFixedRate(new ScheduleTask2(), 0, Values.SEVER_PERIOD);
         HandlerClass handler = new HandlerClass();
         this.addMouseListener(handler);
         this.addMouseMotionListener(handler);
+        
+        /// TESTS ///
+        
+        MyDeck.addCard(0);
+        MyRejected.addCard(0);
+        OpponentsDeck.addCard(0);
+        OpponentsRejected.addCard(0);
+        
+        /// TESTS ///
         
 	}
 	
@@ -171,7 +172,6 @@ public class GamePanel extends JPanel{
 		if(MyRejected.size()>0) {
 			g.drawImage(MyRejected.returnStackImage(),MyRejected.returnX(),MyRejected.returnY(),this);
 		}
-		//if(OpponentsDeck.size()>0) {
 		if(Values.OpponentsDeckSize>0) {
 			g.drawImage(OpponentsDeck.returnStackImage(), OpponentsDeck.returnX(), OpponentsDeck.returnY(), this);
 		}
@@ -323,49 +323,27 @@ public class GamePanel extends JPanel{
 		g.drawImage(GameInfo.CardsLibrary[MyRejected.getCard(focused)].returnFrontImage(),RejectedViewerObject.focusedX(2),y,this);
 	}
 	
-	private BufferedImage resizeBoard(BufferedImage img, int newW, int newH) {
-		shift = (int)(28*((float)newH/972.0));
-		newW = (int)Math.round((newH-shift)/BoardRatio);
-		newH = newH - shift;
-	    Image tmp = img.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
-	    BufferedImage dimg = new BufferedImage(newW, newH, BufferedImage.TYPE_3BYTE_BGR);
-
-	    Graphics2D g2d = dimg.createGraphics();
-	    g2d.drawImage(tmp, 0, 0, null);
-	    g2d.dispose();
-
-	    return dimg;
-	}
-	
-	private BufferedImage resizeBackground(BufferedImage img, int newW, int newH) {
-		shift = (int)(28*((float)newH/972.0));
-		newW = (int)Math.round((newH-shift)/BackgroundRatio);
-		newH = newH - shift;
+	private BufferedImage resizeImage(BufferedImage img, int newW, int newH) {
+		newW = (int)Math.round( (float)(newH) / ((float)img.getHeight()/(float)img.getWidth()) );
 	    Image tmp = img.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
 	    BufferedImage dimg = new BufferedImage(newW, newH, BufferedImage.TYPE_4BYTE_ABGR);
-
 	    Graphics2D g2d = dimg.createGraphics();
 	    g2d.drawImage(tmp, 0, 0, null);
 	    g2d.dispose();
-
 	    return dimg;
 	}
 	
 	private class ScheduleTask extends TimerTask {
         @Override
         public void run() {
-
         	repaint();
         	updateLabels();
-        	
         }
     }
 	
 	private class ScheduleTask2 extends TimerTask{
-
 		@Override
 		public void run() {
-			// TODO Auto-generated method stub
 			sendValues();
         	receiveValues();
 			if(Values.HOST) {
@@ -374,9 +352,7 @@ public class GamePanel extends JPanel{
 				myClient.sendMessage();
 			}
 			updateScrollPane();
-			
 		}
-		
 	}
 	
 	private void sendValues() {
@@ -469,13 +445,10 @@ public class GamePanel extends JPanel{
 	private void resizeWindow() {
 		ResizeButton.setEnabled(false);
 		timer.cancel();
-		if(Values.SIZE_VALUE==0) {
-			Values.setBiggerScreen();
-		}else if(Values.SIZE_VALUE==1){
-			Values.setSmallerScreen();
-		}
-		CurrentBoard = resizeBoard(Board,Values.DEFAULT_X,Values.DEFAULT_Y);
-		CurrentBackground = resizeBackground(Background,Values.DEFAULT_X,Values.DEFAULT_Y);
+		Values.changeScreenSize(); //przed wszystkim, zmienia wartoœci DEFAULT_X i DEFAULT_Y
+		
+		CurrentBoard = resizeImage(Board,Values.DEFAULT_X,Values.DEFAULT_Y);
+		CurrentBackground = resizeImage(Background,Values.DEFAULT_X,Values.DEFAULT_Y);
 		GameInfo.resizeAllCards();
 		setFieldsPositions();
 		setStacksPositions(); //musi byæ po przeskalowaniu kart
@@ -489,206 +462,186 @@ public class GamePanel extends JPanel{
 		for(int i=0;i<Values.FIELDS_AMOUNT;i++) {
 			BoardFields[i].getImage();
 		}
+		
 		setSize(Values.DEFAULT_X,Values.DEFAULT_Y);
-		upperFrame.setSize(Values.DEFAULT_X, Values.DEFAULT_Y); //no ja nie wiem czy tak powinno byæ
+		JFrame temp = new JFrame();
+		temp.pack();
+		Insets insets = temp.getInsets();
+		temp = null;
+		upperFrame.setSize(insets.left + Values.DEFAULT_X, insets.top + Values.DEFAULT_Y);
+		
 		timer = new Timer();
         timer.scheduleAtFixedRate(new ScheduleTask(), 0, Values.PERIOD);
         ResizeButton.setEnabled(true);
 	}
 	
 	private void setFields() {
-		BoardFields[0] = new Field(0,(int)Math.round(Values.DEFAULT_X*(0.13)),(int)Math.round(Values.DEFAULT_Y*(0.516)));
-		BoardFields[2] = new Field(0,(int)Math.round(Values.DEFAULT_X*(0.13)),(int)Math.round(Values.DEFAULT_Y*(0.5)));
-		BoardFields[4] = new Field(0,(int)Math.round(Values.DEFAULT_X*(0.261)),(int)Math.round(Values.DEFAULT_Y*(0.516)));
-		BoardFields[6] = new Field(0,(int)Math.round(Values.DEFAULT_X*(0.261)),(int)Math.round(Values.DEFAULT_Y*(0.5)));
-		BoardFields[8] = new Field(0,(int)Math.round(Values.DEFAULT_X*(0.398)),(int)Math.round(Values.DEFAULT_Y*(0.516)));
-		BoardFields[10] = new Field(0,(int)Math.round(Values.DEFAULT_X*(0.398)),(int)Math.round(Values.DEFAULT_Y*(0.5)));
-		BoardFields[12] = new Field(0,(int)Math.round(Values.DEFAULT_X*(0.528)),(int)Math.round(Values.DEFAULT_Y*(0.516)));
-		BoardFields[14] = new Field(0,(int)Math.round(Values.DEFAULT_X*(0.528)),(int)Math.round(Values.DEFAULT_Y*(0.5)));
-		BoardFields[16] = new Field(0,(int)Math.round(Values.DEFAULT_X*(0.129)),(int)Math.round(Values.DEFAULT_Y*(0.751)));
-		BoardFields[18] = new Field(0,(int)Math.round(Values.DEFAULT_X*(0.129)),(int)Math.round(Values.DEFAULT_Y*(0.735)));
-		BoardFields[20] = new Field(0,(int)Math.round(Values.DEFAULT_X*(0.26)),(int)Math.round(Values.DEFAULT_Y*(0.751)));
-		BoardFields[22] = new Field(0,(int)Math.round(Values.DEFAULT_X*(0.26)),(int)Math.round(Values.DEFAULT_Y*(0.735)));
-		BoardFields[24] = new Field(0,(int)Math.round(Values.DEFAULT_X*(0.398)),(int)Math.round(Values.DEFAULT_Y*(0.752)));
-		BoardFields[26] = new Field(0,(int)Math.round(Values.DEFAULT_X*(0.398)),(int)Math.round(Values.DEFAULT_Y*(0.736)));
-		BoardFields[28] = new Field(0,(int)Math.round(Values.DEFAULT_X*(0.528)),(int)Math.round(Values.DEFAULT_Y*(0.752)));
-		BoardFields[30] = new Field(0,(int)Math.round(Values.DEFAULT_X*(0.528)),(int)Math.round(Values.DEFAULT_Y*(0.736)));
-		
-		BoardFields[1] = new Field(90,(int)Math.round(Values.DEFAULT_X*(0.113)),(int)Math.round(Values.DEFAULT_Y*(0.54)));
-		BoardFields[3] = new Field(90,(int)Math.round(Values.DEFAULT_X*(0.113)),(int)Math.round(Values.DEFAULT_Y*(0.507)));
-		BoardFields[5] = new Field(90,(int)Math.round(Values.DEFAULT_X*(0.244)),(int)Math.round(Values.DEFAULT_Y*(0.54)));
-		BoardFields[7] = new Field(90,(int)Math.round(Values.DEFAULT_X*(0.244)),(int)Math.round(Values.DEFAULT_Y*(0.507)));
-		BoardFields[9] = new Field(90,(int)Math.round(Values.DEFAULT_X*(0.381)),(int)Math.round(Values.DEFAULT_Y*(0.54)));
-		BoardFields[11] = new Field(90,(int)Math.round(Values.DEFAULT_X*(0.381)),(int)Math.round(Values.DEFAULT_Y*(0.507)));
-		BoardFields[13] = new Field(90,(int)Math.round(Values.DEFAULT_X*(0.511)),(int)Math.round(Values.DEFAULT_Y*(0.54)));
-		BoardFields[15] = new Field(90,(int)Math.round(Values.DEFAULT_X*(0.511)),(int)Math.round(Values.DEFAULT_Y*(0.507)));
-		BoardFields[17] = new Field(90,(int)Math.round(Values.DEFAULT_X*(0.112)),(int)Math.round(Values.DEFAULT_Y*(0.775)));
-		BoardFields[19] = new Field(90,(int)Math.round(Values.DEFAULT_X*(0.112)),(int)Math.round(Values.DEFAULT_Y*(0.742)));
-		BoardFields[21] = new Field(90,(int)Math.round(Values.DEFAULT_X*(0.243)),(int)Math.round(Values.DEFAULT_Y*(0.778)));
-		BoardFields[23] = new Field(90,(int)Math.round(Values.DEFAULT_X*(0.243)),(int)Math.round(Values.DEFAULT_Y*(0.745)));
-		BoardFields[25] = new Field(90,(int)Math.round(Values.DEFAULT_X*(0.381)),(int)Math.round(Values.DEFAULT_Y*(0.778)));
-		BoardFields[27] = new Field(90,(int)Math.round(Values.DEFAULT_X*(0.381)),(int)Math.round(Values.DEFAULT_Y*(0.745)));
-		BoardFields[29] = new Field(90,(int)Math.round(Values.DEFAULT_X*(0.511)),(int)Math.round(Values.DEFAULT_Y*(0.778)));
-		BoardFields[31] = new Field(90,(int)Math.round(Values.DEFAULT_X*(0.511)),(int)Math.round(Values.DEFAULT_Y*(0.745)));
-		
-		BoardFields[32] = new Field(180,(int)Math.round(Values.DEFAULT_X*(0.13)),(int)Math.round(Values.DEFAULT_Y*(0.038)));
-		BoardFields[34] = new Field(180,(int)Math.round(Values.DEFAULT_X*(0.13)),(int)Math.round(Values.DEFAULT_Y*(0.054)));
-		BoardFields[36] = new Field(180,(int)Math.round(Values.DEFAULT_X*(0.26)),(int)Math.round(Values.DEFAULT_Y*(0.038)));
-		BoardFields[38] = new Field(180,(int)Math.round(Values.DEFAULT_X*(0.26)),(int)Math.round(Values.DEFAULT_Y*(0.054)));
-		BoardFields[40] = new Field(180,(int)Math.round(Values.DEFAULT_X*(0.398)),(int)Math.round(Values.DEFAULT_Y*(0.038)));
-		BoardFields[42] = new Field(180,(int)Math.round(Values.DEFAULT_X*(0.398)),(int)Math.round(Values.DEFAULT_Y*(0.054)));
-		BoardFields[44] = new Field(180,(int)Math.round(Values.DEFAULT_X*(0.528)),(int)Math.round(Values.DEFAULT_Y*(0.038)));
-		BoardFields[46] = new Field(180,(int)Math.round(Values.DEFAULT_X*(0.528)),(int)Math.round(Values.DEFAULT_Y*(0.054)));
-		BoardFields[48] = new Field(180,(int)Math.round(Values.DEFAULT_X*(0.129)),(int)Math.round(Values.DEFAULT_Y*(0.274)));
-		BoardFields[50] = new Field(180,(int)Math.round(Values.DEFAULT_X*(0.129)),(int)Math.round(Values.DEFAULT_Y*(0.29)));
-		BoardFields[52] = new Field(180,(int)Math.round(Values.DEFAULT_X*(0.26)),(int)Math.round(Values.DEFAULT_Y*(0.274)));
-		BoardFields[54] = new Field(180,(int)Math.round(Values.DEFAULT_X*(0.26)),(int)Math.round(Values.DEFAULT_Y*(0.29)));
-		BoardFields[56] = new Field(180,(int)Math.round(Values.DEFAULT_X*(0.398)),(int)Math.round(Values.DEFAULT_Y*(0.274)));
-		BoardFields[58] = new Field(180,(int)Math.round(Values.DEFAULT_X*(0.398)),(int)Math.round(Values.DEFAULT_Y*(0.29)));
-		BoardFields[60] = new Field(180,(int)Math.round(Values.DEFAULT_X*(0.528)),(int)Math.round(Values.DEFAULT_Y*(0.274)));
-		BoardFields[62] = new Field(180,(int)Math.round(Values.DEFAULT_X*(0.528)),(int)Math.round(Values.DEFAULT_Y*(0.29)));
-		
-		BoardFields[33] = new Field(270,(int)Math.round(Values.DEFAULT_X*(0.113)),(int)Math.round(Values.DEFAULT_Y*(0.063)));
-		BoardFields[35] = new Field(270,(int)Math.round(Values.DEFAULT_X*(0.113)),(int)Math.round(Values.DEFAULT_Y*(0.096)));
-		BoardFields[37] = new Field(270,(int)Math.round(Values.DEFAULT_X*(0.243)),(int)Math.round(Values.DEFAULT_Y*(0.063)));
-		BoardFields[39] = new Field(270,(int)Math.round(Values.DEFAULT_X*(0.243)),(int)Math.round(Values.DEFAULT_Y*(0.096)));
-		BoardFields[41] = new Field(270,(int)Math.round(Values.DEFAULT_X*(0.381)),(int)Math.round(Values.DEFAULT_Y*(0.063)));
-		BoardFields[43] = new Field(270,(int)Math.round(Values.DEFAULT_X*(0.381)),(int)Math.round(Values.DEFAULT_Y*(0.096)));
-		BoardFields[45] = new Field(270,(int)Math.round(Values.DEFAULT_X*(0.511)),(int)Math.round(Values.DEFAULT_Y*(0.063)));
-		BoardFields[47] = new Field(270,(int)Math.round(Values.DEFAULT_X*(0.511)),(int)Math.round(Values.DEFAULT_Y*(0.096)));
-		BoardFields[49] = new Field(270,(int)Math.round(Values.DEFAULT_X*(0.113)),(int)Math.round(Values.DEFAULT_Y*(0.301)));
-		BoardFields[51] = new Field(270,(int)Math.round(Values.DEFAULT_X*(0.113)),(int)Math.round(Values.DEFAULT_Y*(0.334)));
-		BoardFields[53] = new Field(270,(int)Math.round(Values.DEFAULT_X*(0.243)),(int)Math.round(Values.DEFAULT_Y*(0.301)));
-		BoardFields[55] = new Field(270,(int)Math.round(Values.DEFAULT_X*(0.243)),(int)Math.round(Values.DEFAULT_Y*(0.334)));
-		BoardFields[57] = new Field(270,(int)Math.round(Values.DEFAULT_X*(0.381)),(int)Math.round(Values.DEFAULT_Y*(0.301)));
-		BoardFields[59] = new Field(270,(int)Math.round(Values.DEFAULT_X*(0.381)),(int)Math.round(Values.DEFAULT_Y*(0.334)));
-		BoardFields[61] = new Field(270,(int)Math.round(Values.DEFAULT_X*(0.511)),(int)Math.round(Values.DEFAULT_Y*(0.301)));
-		BoardFields[63] = new Field(270,(int)Math.round(Values.DEFAULT_X*(0.511)),(int)Math.round(Values.DEFAULT_Y*(0.334)));
+		for(int i=0;i<31;i+=2) {
+			BoardFields[i] = new Field(0);
+		}
+		for(int i=1;i<32;i+=2) {
+			BoardFields[i] = new Field(90);
+		}
+		for(int i=32;i<63;i+=2) {
+			BoardFields[i] = new Field(180);
+		}
+		for(int i=33;i<64;i+=2) {
+			BoardFields[i] = new Field(270);
+		}
+		setFieldsPositions();
 	}
 	
 	private void setFieldsPositions() {
-		BoardFields[0].setPositions((int)Math.round(Values.DEFAULT_X*(0.13)),(int)Math.round(Values.DEFAULT_Y*(0.516)));
-		BoardFields[2].setPositions((int)Math.round(Values.DEFAULT_X*(0.13)),(int)Math.round(Values.DEFAULT_Y*(0.5)));
-		BoardFields[4].setPositions((int)Math.round(Values.DEFAULT_X*(0.261)),(int)Math.round(Values.DEFAULT_Y*(0.516)));
-		BoardFields[6].setPositions((int)Math.round(Values.DEFAULT_X*(0.261)),(int)Math.round(Values.DEFAULT_Y*(0.5)));
-		BoardFields[8].setPositions((int)Math.round(Values.DEFAULT_X*(0.398)),(int)Math.round(Values.DEFAULT_Y*(0.516)));
-		BoardFields[10].setPositions((int)Math.round(Values.DEFAULT_X*(0.398)),(int)Math.round(Values.DEFAULT_Y*(0.5)));
-		BoardFields[12].setPositions((int)Math.round(Values.DEFAULT_X*(0.528)),(int)Math.round(Values.DEFAULT_Y*(0.516)));
-		BoardFields[14].setPositions((int)Math.round(Values.DEFAULT_X*(0.528)),(int)Math.round(Values.DEFAULT_Y*(0.5)));
-		BoardFields[16].setPositions((int)Math.round(Values.DEFAULT_X*(0.129)),(int)Math.round(Values.DEFAULT_Y*(0.751)));
-		BoardFields[18].setPositions((int)Math.round(Values.DEFAULT_X*(0.129)),(int)Math.round(Values.DEFAULT_Y*(0.735)));
-		BoardFields[20].setPositions((int)Math.round(Values.DEFAULT_X*(0.26)),(int)Math.round(Values.DEFAULT_Y*(0.751)));
-		BoardFields[22].setPositions((int)Math.round(Values.DEFAULT_X*(0.26)),(int)Math.round(Values.DEFAULT_Y*(0.735)));
-		BoardFields[24].setPositions((int)Math.round(Values.DEFAULT_X*(0.398)),(int)Math.round(Values.DEFAULT_Y*(0.752)));
-		BoardFields[26].setPositions((int)Math.round(Values.DEFAULT_X*(0.398)),(int)Math.round(Values.DEFAULT_Y*(0.736)));
-		BoardFields[28].setPositions((int)Math.round(Values.DEFAULT_X*(0.528)),(int)Math.round(Values.DEFAULT_Y*(0.752)));
-		BoardFields[30].setPositions((int)Math.round(Values.DEFAULT_X*(0.528)),(int)Math.round(Values.DEFAULT_Y*(0.736)));
+		BoardFields[0].setPositions((int)Math.round(Values.DEFAULT_X*(0.133)),(int)Math.round(Values.DEFAULT_Y*(0.532)));
+		BoardFields[2].setPositions((int)Math.round(Values.DEFAULT_X*(0.133)),(int)Math.round(Values.DEFAULT_Y*(0.516)));
+		BoardFields[4].setPositions((int)Math.round(Values.DEFAULT_X*(0.266)),(int)Math.round(Values.DEFAULT_Y*(0.532)));
+		BoardFields[6].setPositions((int)Math.round(Values.DEFAULT_X*(0.266)),(int)Math.round(Values.DEFAULT_Y*(0.516)));
+		BoardFields[8].setPositions((int)Math.round(Values.DEFAULT_X*(0.407)),(int)Math.round(Values.DEFAULT_Y*(0.532)));
+		BoardFields[10].setPositions((int)Math.round(Values.DEFAULT_X*(0.407)),(int)Math.round(Values.DEFAULT_Y*(0.516)));
+		BoardFields[12].setPositions((int)Math.round(Values.DEFAULT_X*(0.540)),(int)Math.round(Values.DEFAULT_Y*(0.532)));
+		BoardFields[14].setPositions((int)Math.round(Values.DEFAULT_X*(0.540)),(int)Math.round(Values.DEFAULT_Y*(0.516)));
 		
-		BoardFields[1].setPositions((int)Math.round(Values.DEFAULT_X*(0.113)),(int)Math.round(Values.DEFAULT_Y*(0.54)));
-		BoardFields[3].setPositions((int)Math.round(Values.DEFAULT_X*(0.113)),(int)Math.round(Values.DEFAULT_Y*(0.507)));
-		BoardFields[5].setPositions((int)Math.round(Values.DEFAULT_X*(0.244)),(int)Math.round(Values.DEFAULT_Y*(0.54)));
-		BoardFields[7].setPositions((int)Math.round(Values.DEFAULT_X*(0.244)),(int)Math.round(Values.DEFAULT_Y*(0.507)));
-		BoardFields[9].setPositions((int)Math.round(Values.DEFAULT_X*(0.381)),(int)Math.round(Values.DEFAULT_Y*(0.54)));
-		BoardFields[11].setPositions((int)Math.round(Values.DEFAULT_X*(0.381)),(int)Math.round(Values.DEFAULT_Y*(0.507)));
-		BoardFields[13].setPositions((int)Math.round(Values.DEFAULT_X*(0.511)),(int)Math.round(Values.DEFAULT_Y*(0.54)));
-		BoardFields[15].setPositions((int)Math.round(Values.DEFAULT_X*(0.511)),(int)Math.round(Values.DEFAULT_Y*(0.507)));
-		BoardFields[17].setPositions((int)Math.round(Values.DEFAULT_X*(0.112)),(int)Math.round(Values.DEFAULT_Y*(0.775)));
-		BoardFields[19].setPositions((int)Math.round(Values.DEFAULT_X*(0.112)),(int)Math.round(Values.DEFAULT_Y*(0.742)));
-		BoardFields[21].setPositions((int)Math.round(Values.DEFAULT_X*(0.243)),(int)Math.round(Values.DEFAULT_Y*(0.778)));
-		BoardFields[23].setPositions((int)Math.round(Values.DEFAULT_X*(0.243)),(int)Math.round(Values.DEFAULT_Y*(0.745)));
-		BoardFields[25].setPositions((int)Math.round(Values.DEFAULT_X*(0.381)),(int)Math.round(Values.DEFAULT_Y*(0.778)));
-		BoardFields[27].setPositions((int)Math.round(Values.DEFAULT_X*(0.381)),(int)Math.round(Values.DEFAULT_Y*(0.745)));
-		BoardFields[29].setPositions((int)Math.round(Values.DEFAULT_X*(0.511)),(int)Math.round(Values.DEFAULT_Y*(0.778)));
-		BoardFields[31].setPositions((int)Math.round(Values.DEFAULT_X*(0.511)),(int)Math.round(Values.DEFAULT_Y*(0.745)));
+		BoardFields[16].setPositions((int)Math.round(Values.DEFAULT_X*(0.133)),(int)Math.round(Values.DEFAULT_Y*(0.775)));
+		BoardFields[18].setPositions((int)Math.round(Values.DEFAULT_X*(0.133)),(int)Math.round(Values.DEFAULT_Y*(0.758)));
+		BoardFields[20].setPositions((int)Math.round(Values.DEFAULT_X*(0.266)),(int)Math.round(Values.DEFAULT_Y*(0.775)));
+		BoardFields[22].setPositions((int)Math.round(Values.DEFAULT_X*(0.266)),(int)Math.round(Values.DEFAULT_Y*(0.758)));
+		BoardFields[24].setPositions((int)Math.round(Values.DEFAULT_X*(0.407)),(int)Math.round(Values.DEFAULT_Y*(0.775)));
+		BoardFields[26].setPositions((int)Math.round(Values.DEFAULT_X*(0.407)),(int)Math.round(Values.DEFAULT_Y*(0.758)));
+		BoardFields[28].setPositions((int)Math.round(Values.DEFAULT_X*(0.540)),(int)Math.round(Values.DEFAULT_Y*(0.775)));
+		BoardFields[30].setPositions((int)Math.round(Values.DEFAULT_X*(0.540)),(int)Math.round(Values.DEFAULT_Y*(0.758)));
 		
-		BoardFields[32].setPositions((int)Math.round(Values.DEFAULT_X*(0.13)),(int)Math.round(Values.DEFAULT_Y*(0.038)));
-		BoardFields[34].setPositions((int)Math.round(Values.DEFAULT_X*(0.13)),(int)Math.round(Values.DEFAULT_Y*(0.054)));
-		BoardFields[36].setPositions((int)Math.round(Values.DEFAULT_X*(0.26)),(int)Math.round(Values.DEFAULT_Y*(0.038)));
-		BoardFields[38].setPositions((int)Math.round(Values.DEFAULT_X*(0.26)),(int)Math.round(Values.DEFAULT_Y*(0.054)));
-		BoardFields[40].setPositions((int)Math.round(Values.DEFAULT_X*(0.398)),(int)Math.round(Values.DEFAULT_Y*(0.038)));
-		BoardFields[42].setPositions((int)Math.round(Values.DEFAULT_X*(0.398)),(int)Math.round(Values.DEFAULT_Y*(0.054)));
-		BoardFields[44].setPositions((int)Math.round(Values.DEFAULT_X*(0.528)),(int)Math.round(Values.DEFAULT_Y*(0.038)));
-		BoardFields[46].setPositions((int)Math.round(Values.DEFAULT_X*(0.528)),(int)Math.round(Values.DEFAULT_Y*(0.054)));
-		BoardFields[48].setPositions((int)Math.round(Values.DEFAULT_X*(0.129)),(int)Math.round(Values.DEFAULT_Y*(0.274)));
-		BoardFields[50].setPositions((int)Math.round(Values.DEFAULT_X*(0.129)),(int)Math.round(Values.DEFAULT_Y*(0.29)));
-		BoardFields[52].setPositions((int)Math.round(Values.DEFAULT_X*(0.26)),(int)Math.round(Values.DEFAULT_Y*(0.274)));
-		BoardFields[54].setPositions((int)Math.round(Values.DEFAULT_X*(0.26)),(int)Math.round(Values.DEFAULT_Y*(0.29)));
-		BoardFields[56].setPositions((int)Math.round(Values.DEFAULT_X*(0.398)),(int)Math.round(Values.DEFAULT_Y*(0.274)));
-		BoardFields[58].setPositions((int)Math.round(Values.DEFAULT_X*(0.398)),(int)Math.round(Values.DEFAULT_Y*(0.29)));
-		BoardFields[60].setPositions((int)Math.round(Values.DEFAULT_X*(0.528)),(int)Math.round(Values.DEFAULT_Y*(0.274)));
-		BoardFields[62].setPositions((int)Math.round(Values.DEFAULT_X*(0.528)),(int)Math.round(Values.DEFAULT_Y*(0.29)));
 		
-		BoardFields[33].setPositions((int)Math.round(Values.DEFAULT_X*(0.113)),(int)Math.round(Values.DEFAULT_Y*(0.063)));
-		BoardFields[35].setPositions((int)Math.round(Values.DEFAULT_X*(0.113)),(int)Math.round(Values.DEFAULT_Y*(0.096)));
-		BoardFields[37].setPositions((int)Math.round(Values.DEFAULT_X*(0.243)),(int)Math.round(Values.DEFAULT_Y*(0.063)));
-		BoardFields[39].setPositions((int)Math.round(Values.DEFAULT_X*(0.243)),(int)Math.round(Values.DEFAULT_Y*(0.096)));
-		BoardFields[41].setPositions((int)Math.round(Values.DEFAULT_X*(0.381)),(int)Math.round(Values.DEFAULT_Y*(0.063)));
-		BoardFields[43].setPositions((int)Math.round(Values.DEFAULT_X*(0.381)),(int)Math.round(Values.DEFAULT_Y*(0.096)));
-		BoardFields[45].setPositions((int)Math.round(Values.DEFAULT_X*(0.511)),(int)Math.round(Values.DEFAULT_Y*(0.063)));
-		BoardFields[47].setPositions((int)Math.round(Values.DEFAULT_X*(0.511)),(int)Math.round(Values.DEFAULT_Y*(0.096)));
-		BoardFields[49].setPositions((int)Math.round(Values.DEFAULT_X*(0.113)),(int)Math.round(Values.DEFAULT_Y*(0.301)));
-		BoardFields[51].setPositions((int)Math.round(Values.DEFAULT_X*(0.113)),(int)Math.round(Values.DEFAULT_Y*(0.334)));
-		BoardFields[53].setPositions((int)Math.round(Values.DEFAULT_X*(0.243)),(int)Math.round(Values.DEFAULT_Y*(0.301)));
-		BoardFields[55].setPositions((int)Math.round(Values.DEFAULT_X*(0.243)),(int)Math.round(Values.DEFAULT_Y*(0.334)));
-		BoardFields[57].setPositions((int)Math.round(Values.DEFAULT_X*(0.381)),(int)Math.round(Values.DEFAULT_Y*(0.301)));
-		BoardFields[59].setPositions((int)Math.round(Values.DEFAULT_X*(0.381)),(int)Math.round(Values.DEFAULT_Y*(0.334)));
-		BoardFields[61].setPositions((int)Math.round(Values.DEFAULT_X*(0.511)),(int)Math.round(Values.DEFAULT_Y*(0.301)));
-		BoardFields[63].setPositions((int)Math.round(Values.DEFAULT_X*(0.511)),(int)Math.round(Values.DEFAULT_Y*(0.334)));
+		
+		BoardFields[1].setPositions((int)Math.round(Values.DEFAULT_X*(0.116)),(int)Math.round(Values.DEFAULT_Y*(0.556)));
+		BoardFields[3].setPositions((int)Math.round(Values.DEFAULT_X*(0.116)),(int)Math.round(Values.DEFAULT_Y*(0.524)));
+		BoardFields[5].setPositions((int)Math.round(Values.DEFAULT_X*(0.250)),(int)Math.round(Values.DEFAULT_Y*(0.556)));
+		BoardFields[7].setPositions((int)Math.round(Values.DEFAULT_X*(0.250)),(int)Math.round(Values.DEFAULT_Y*(0.524)));
+		BoardFields[9].setPositions((int)Math.round(Values.DEFAULT_X*(0.389)),(int)Math.round(Values.DEFAULT_Y*(0.556)));
+		BoardFields[11].setPositions((int)Math.round(Values.DEFAULT_X*(0.389)),(int)Math.round(Values.DEFAULT_Y*(0.524)));
+		BoardFields[13].setPositions((int)Math.round(Values.DEFAULT_X*(0.522)),(int)Math.round(Values.DEFAULT_Y*(0.556)));
+		BoardFields[15].setPositions((int)Math.round(Values.DEFAULT_X*(0.522)),(int)Math.round(Values.DEFAULT_Y*(0.524)));
+		
+		BoardFields[17].setPositions((int)Math.round(Values.DEFAULT_X*(0.116)),(int)Math.round(Values.DEFAULT_Y*(0.801)));
+		BoardFields[19].setPositions((int)Math.round(Values.DEFAULT_X*(0.116)),(int)Math.round(Values.DEFAULT_Y*(0.769)));
+		BoardFields[21].setPositions((int)Math.round(Values.DEFAULT_X*(0.250)),(int)Math.round(Values.DEFAULT_Y*(0.801)));
+		BoardFields[23].setPositions((int)Math.round(Values.DEFAULT_X*(0.250)),(int)Math.round(Values.DEFAULT_Y*(0.769)));
+		BoardFields[25].setPositions((int)Math.round(Values.DEFAULT_X*(0.389)),(int)Math.round(Values.DEFAULT_Y*(0.801)));
+		BoardFields[27].setPositions((int)Math.round(Values.DEFAULT_X*(0.389)),(int)Math.round(Values.DEFAULT_Y*(0.769)));
+		BoardFields[29].setPositions((int)Math.round(Values.DEFAULT_X*(0.522)),(int)Math.round(Values.DEFAULT_Y*(0.801)));
+		BoardFields[31].setPositions((int)Math.round(Values.DEFAULT_X*(0.522)),(int)Math.round(Values.DEFAULT_Y*(0.769)));
+		
+		
+		
+		BoardFields[32].setPositions((int)Math.round(Values.DEFAULT_X*(0.133)),(int)Math.round(Values.DEFAULT_Y*(0.040)));
+		BoardFields[34].setPositions((int)Math.round(Values.DEFAULT_X*(0.133)),(int)Math.round(Values.DEFAULT_Y*(0.056)));
+		BoardFields[36].setPositions((int)Math.round(Values.DEFAULT_X*(0.266)),(int)Math.round(Values.DEFAULT_Y*(0.040)));
+		BoardFields[38].setPositions((int)Math.round(Values.DEFAULT_X*(0.266)),(int)Math.round(Values.DEFAULT_Y*(0.056)));
+		BoardFields[40].setPositions((int)Math.round(Values.DEFAULT_X*(0.407)),(int)Math.round(Values.DEFAULT_Y*(0.040)));
+		BoardFields[42].setPositions((int)Math.round(Values.DEFAULT_X*(0.407)),(int)Math.round(Values.DEFAULT_Y*(0.056)));
+		BoardFields[44].setPositions((int)Math.round(Values.DEFAULT_X*(0.540)),(int)Math.round(Values.DEFAULT_Y*(0.040)));
+		BoardFields[46].setPositions((int)Math.round(Values.DEFAULT_X*(0.540)),(int)Math.round(Values.DEFAULT_Y*(0.056)));
+		
+		BoardFields[48].setPositions((int)Math.round(Values.DEFAULT_X*(0.133)),(int)Math.round(Values.DEFAULT_Y*(0.284)));
+		BoardFields[50].setPositions((int)Math.round(Values.DEFAULT_X*(0.133)),(int)Math.round(Values.DEFAULT_Y*(0.301)));
+		BoardFields[52].setPositions((int)Math.round(Values.DEFAULT_X*(0.266)),(int)Math.round(Values.DEFAULT_Y*(0.284)));
+		BoardFields[54].setPositions((int)Math.round(Values.DEFAULT_X*(0.266)),(int)Math.round(Values.DEFAULT_Y*(0.301)));
+		BoardFields[56].setPositions((int)Math.round(Values.DEFAULT_X*(0.407)),(int)Math.round(Values.DEFAULT_Y*(0.284)));
+		BoardFields[58].setPositions((int)Math.round(Values.DEFAULT_X*(0.407)),(int)Math.round(Values.DEFAULT_Y*(0.301)));
+		BoardFields[60].setPositions((int)Math.round(Values.DEFAULT_X*(0.540)),(int)Math.round(Values.DEFAULT_Y*(0.284)));
+		BoardFields[62].setPositions((int)Math.round(Values.DEFAULT_X*(0.540)),(int)Math.round(Values.DEFAULT_Y*(0.301)));
+		
+		
+		
+		BoardFields[33].setPositions((int)Math.round(Values.DEFAULT_X*(0.116)),(int)Math.round(Values.DEFAULT_Y*(0.066)));
+		BoardFields[35].setPositions((int)Math.round(Values.DEFAULT_X*(0.116)),(int)Math.round(Values.DEFAULT_Y*(0.098)));
+		BoardFields[37].setPositions((int)Math.round(Values.DEFAULT_X*(0.250)),(int)Math.round(Values.DEFAULT_Y*(0.066)));
+		BoardFields[39].setPositions((int)Math.round(Values.DEFAULT_X*(0.250)),(int)Math.round(Values.DEFAULT_Y*(0.098)));
+		BoardFields[41].setPositions((int)Math.round(Values.DEFAULT_X*(0.389)),(int)Math.round(Values.DEFAULT_Y*(0.066)));
+		BoardFields[43].setPositions((int)Math.round(Values.DEFAULT_X*(0.389)),(int)Math.round(Values.DEFAULT_Y*(0.098)));
+		BoardFields[45].setPositions((int)Math.round(Values.DEFAULT_X*(0.522)),(int)Math.round(Values.DEFAULT_Y*(0.066)));
+		BoardFields[47].setPositions((int)Math.round(Values.DEFAULT_X*(0.522)),(int)Math.round(Values.DEFAULT_Y*(0.098)));
+		
+		BoardFields[49].setPositions((int)Math.round(Values.DEFAULT_X*(0.116)),(int)Math.round(Values.DEFAULT_Y*(0.311)));
+		BoardFields[51].setPositions((int)Math.round(Values.DEFAULT_X*(0.116)),(int)Math.round(Values.DEFAULT_Y*(0.343)));
+		BoardFields[53].setPositions((int)Math.round(Values.DEFAULT_X*(0.250)),(int)Math.round(Values.DEFAULT_Y*(0.311)));
+		BoardFields[55].setPositions((int)Math.round(Values.DEFAULT_X*(0.250)),(int)Math.round(Values.DEFAULT_Y*(0.343)));
+		BoardFields[57].setPositions((int)Math.round(Values.DEFAULT_X*(0.389)),(int)Math.round(Values.DEFAULT_Y*(0.311)));
+		BoardFields[59].setPositions((int)Math.round(Values.DEFAULT_X*(0.389)),(int)Math.round(Values.DEFAULT_Y*(0.343)));
+		BoardFields[61].setPositions((int)Math.round(Values.DEFAULT_X*(0.522)),(int)Math.round(Values.DEFAULT_Y*(0.311)));
+		BoardFields[63].setPositions((int)Math.round(Values.DEFAULT_X*(0.522)),(int)Math.round(Values.DEFAULT_Y*(0.343)));
 	}
 
 	private void setStacks() {
-		MyDeck = new Stack(0,(int)Math.round(Values.DEFAULT_X*(0.77)),(int)Math.round(Values.DEFAULT_Y*(0.73)),false);
-		MyDeck.setImage(GameInfo.CardsLibrary[0].returnBackImage());
-		MyRejected = new Stack(0,(int)Math.round(Values.DEFAULT_X*(0.88)),(int)Math.round(Values.DEFAULT_Y*(0.73)),true);
-		OpponentsDeck = new Stack(180,(int)Math.round(Values.DEFAULT_X*(0.77)),(int)Math.round(Values.DEFAULT_Y*(0.05)),false);
-		OpponentsDeck.setImage(GameInfo.CardsLibrary[0].returnBackImage());
-		OpponentsRejected = new Stack(180,(int)Math.round(Values.DEFAULT_X*(0.88)),(int)Math.round(Values.DEFAULT_Y*(0.05)),true);
+		MyDeck = new Stack(0,false);
+		MyRejected = new Stack(0,true);
+		OpponentsDeck = new Stack(180,false);
+		OpponentsRejected = new Stack(180,true);
+		setStacksPositions();
 	}
 	
 	private void setStacksPositions() {
-		MyDeck.setPositions((int)Math.round(Values.DEFAULT_X*(0.77)),(int)Math.round(Values.DEFAULT_Y*(0.73)));
+		MyDeck.setPositions((int)Math.round(Values.DEFAULT_X*(0.79)),(int)Math.round(Values.DEFAULT_Y*(0.77)));
 		MyDeck.setImage(GameInfo.CardsLibrary[0].returnBackImage());
-		MyRejected.setPositions((int)Math.round(Values.DEFAULT_X*(0.88)),(int)Math.round(Values.DEFAULT_Y*(0.73)));
+		MyRejected.setPositions((int)Math.round(Values.DEFAULT_X*(0.895)),(int)Math.round(Values.DEFAULT_Y*(0.77)));
 		MyRejected.updateFrontImage();
-		OpponentsDeck.setPositions((int)Math.round(Values.DEFAULT_X*(0.77)),(int)Math.round(Values.DEFAULT_Y*(0.05)));
+		OpponentsDeck.setPositions((int)Math.round(Values.DEFAULT_X*(0.79)),(int)Math.round(Values.DEFAULT_Y*(0.05)));
 		OpponentsDeck.setImage(GameInfo.CardsLibrary[0].returnBackImage());
-		OpponentsRejected.setPositions((int)Math.round(Values.DEFAULT_X*(0.88)),(int)Math.round(Values.DEFAULT_Y*(0.05)));
+		OpponentsRejected.setPositions((int)Math.round(Values.DEFAULT_X*(0.895)),(int)Math.round(Values.DEFAULT_Y*(0.05)));
 		OpponentsRejected.updateFrontImage();
 	}
 	
 	private void setLabels() {
 		MyStackInfo = new JLabel("Kart w talii: "+MyDeck.size());
 		MyStackInfo.setForeground(Color.WHITE);
-		MyTransformationInfo = new JLabel("Czas transformacji: "+TransformationTime);
-		MyTransformationInfo.setForeground(Color.CYAN);
+		MyTransformationInfo = new JLabel("Czas transformacji");
+		MyTransformationInfo.setForeground(Color.GREEN);
 		OpponentsStackInfo = new JLabel("Kart w talii: "+Values.OpponentsDeckSize);
 		OpponentsStackInfo.setForeground(Color.WHITE);
-		OpponentsTransformationInfo = new JLabel("Czas transformacji: "+Values.OpponentsTransformationTime);
-		OpponentsTransformationInfo.setForeground(Color.CYAN);
+		OpponentsTransformationInfo = new JLabel("Czas transformacji");
+		OpponentsTransformationInfo.setForeground(Color.GREEN);
+		MyTransformationValue = new JLabel(Integer.toString(TransformationTime));
+		OpponentsTransformationValue = new JLabel(Integer.toString(Values.OpponentsTransformationTime));
 		setLabelsPositions();
 		this.add(MyStackInfo);
 		this.add(MyTransformationInfo);
         this.add(OpponentsStackInfo);
         this.add(OpponentsTransformationInfo);
+        //this.add(MyTransformationValue);
+        //this.add(OpponentsTransformationValue);
 	}
 	
 	private void updateLabels() {
 		MyStackInfo.setText("Kart w talii: "+MyDeck.size());
-		MyTransformationInfo.setText("Czas transformacji: "+TransformationTime);
 		OpponentsStackInfo.setText("Kart w talii: "+Values.OpponentsDeckSize);
-		OpponentsTransformationInfo.setText("Czas transformacji: "+Values.OpponentsTransformationTime);
+		MyTransformationValue.setText(Integer.toString(TransformationTime));
+		OpponentsTransformationValue.setText(Integer.toString(Values.OpponentsTransformationTime));
+		if(TransformationTime<1) {
+			MyTransformationValue.setForeground(Color.RED);
+		}else {
+			MyTransformationValue.setForeground(Color.GREEN);
+		}
+		
+		if(Values.OpponentsTransformationTime<1) {
+			OpponentsTransformationValue.setForeground(Color.RED);
+		}else {
+			OpponentsTransformationValue.setForeground(Color.GREEN);
+		}
 	}
 	
 	private void setLabelsPositions() {
-		Font LabelsFont = new Font("Arial",Font.BOLD,(int)Math.round(Values.DEFAULT_X*(0.012)));
+		Font LabelsFont = new Font("Arial",Font.BOLD,(int)Math.round(Values.DEFAULT_Y*(0.017)));
+		Font bigFont = new Font("Arial",Font.BOLD,(int)Math.round(Values.DEFAULT_Y*(0.030)));
 		MyStackInfo.setFont(LabelsFont);
 		MyTransformationInfo.setFont(LabelsFont);
 		OpponentsStackInfo.setFont(LabelsFont);
 		OpponentsTransformationInfo.setFont(LabelsFont);
-		MyStackInfo.setBounds((int)Math.round(Values.DEFAULT_X*(0.77)), (int)Math.round(Values.DEFAULT_Y*(0.68)), (int)Math.round(Values.DEFAULT_X*(0.14)), (int)Math.round(Values.DEFAULT_Y*(0.02)));
+		MyTransformationValue.setFont(bigFont);
+		OpponentsTransformationValue.setFont(bigFont);
+		MyStackInfo.setBounds((int)Math.round(Values.DEFAULT_X*(0.84)), (int)Math.round(Values.DEFAULT_Y*(0.64)), (int)Math.round(Values.DEFAULT_X*(0.14)), (int)Math.round(Values.DEFAULT_Y*(0.02)));
 		MyTransformationInfo.setBounds((int)Math.round(Values.DEFAULT_X*(0.77)), (int)Math.round(Values.DEFAULT_Y*(0.64)), (int)Math.round(Values.DEFAULT_X*(0.18)), (int)Math.round(Values.DEFAULT_X*(0.02)));
 		OpponentsStackInfo.setBounds((int)Math.round(Values.DEFAULT_X*(0.77)), (int)Math.round(Values.DEFAULT_Y*(0.25)), (int)Math.round(Values.DEFAULT_X*(0.14)), (int)Math.round(Values.DEFAULT_Y*(0.02)));
 		OpponentsTransformationInfo.setBounds((int)Math.round(Values.DEFAULT_X*(0.77)), (int)Math.round(Values.DEFAULT_Y*(0.29)), (int)Math.round(Values.DEFAULT_X*(0.18)), (int)Math.round(Values.DEFAULT_Y*(0.02)));
+		
 	}
 	
 	private void setButtons() {
@@ -711,9 +664,9 @@ public class GamePanel extends JPanel{
 		DecreasingTransTime.addActionListener(actList);
 		DecreasingTransTime.setFocusable(false);
 		
-		ResizeButton = new JButton();
+		ResizeButton = new JButton("Zmieñ Rozdzielczoœæ");
 		ResizeButton.setEnabled(true);
-		ResizeButton.setBackground(Color.GRAY);
+		ResizeButton.setBackground(Color.WHITE);
 		ResizeButton.setMargin(null);
 		ResizeButton.setFocusable(false);
 		ResizeButton.addActionListener(actList);
@@ -726,8 +679,8 @@ public class GamePanel extends JPanel{
 	private void setButtonsPositions() {
 		AddingTransTime.setBounds((int)Math.round(Values.DEFAULT_X*(0.955)), (int)Math.round(Values.DEFAULT_Y*(0.621)),(int)Math.round(Values.DEFAULT_X*(0.02)),(int)Math.round(Values.DEFAULT_X*(0.02)));
 		DecreasingTransTime.setBounds((int)Math.round(Values.DEFAULT_X*(0.955)), (int)Math.round(Values.DEFAULT_Y*(0.661)),(int)Math.round(Values.DEFAULT_X*(0.02)),(int)Math.round(Values.DEFAULT_X*(0.02)));
-		int ResButWidth = (int)Math.round(Values.DEFAULT_X*(0.015));
-		int ResButHeight = ResButWidth;
+		int ResButWidth = (int)Math.round(Values.DEFAULT_X*(0.100));
+		int ResButHeight = (int)Math.round(Values.DEFAULT_Y*(0.017));
 		ResizeButton.setBounds(Values.DEFAULT_X-ResButWidth, 0, ResButWidth, ResButHeight);
 	}
 	

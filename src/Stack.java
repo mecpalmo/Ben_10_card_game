@@ -41,6 +41,13 @@ public class Stack {
 		isDeckOpen = isOpen;
 	}
 	
+	Stack(int rv, boolean isOpen){
+		Draw_X = 0;
+		Draw_Y = 0;
+		RotateValue = rv;
+		isDeckOpen = isOpen;
+	}
+	
 	public void addCard(int id) {
 		Cards.add(id);
 		if(isDeckOpen) {

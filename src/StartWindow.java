@@ -8,10 +8,12 @@ import java.awt.event.ActionListener;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 
 @SuppressWarnings("serial")
 public class StartWindow extends JFrame {
@@ -21,8 +23,7 @@ public class StartWindow extends JFrame {
 	
 	int button_x = 100;
 	int button_y = 30;
-	
-	StartPanel myStartPanel;
+
 	JButton StartGame, PrepareDeck, ExitGame;
 	
 	StartWindow(){
@@ -30,8 +31,9 @@ public class StartWindow extends JFrame {
 		this.setSize(size_x,size_y);
 		setResizable(false);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.setAlwaysOnTop(true);
 		
-		myStartPanel = new StartPanel();
+		StartPanel myStartPanel = new StartPanel();
 		this.add(myStartPanel);
 		
 		GameInfo.loadDeckFromFile();
@@ -43,8 +45,8 @@ public class StartWindow extends JFrame {
 	
 	private class StartPanel extends JPanel{
 		
-		JLabel titleLabel;
-		JLabel subTitleLabel;
+		JLabel titleLabel, subTitleLabel;
+		JRadioButton HighRes, SmallRes;
 		
 		StartPanel(){
 			
@@ -55,6 +57,9 @@ public class StartWindow extends JFrame {
 			initLabels();
 			this.add(Box.createVerticalGlue());
 			initButtons();
+			this.add(Box.createVerticalGlue());
+			initRadioButtons();
+			this.add(Box.createVerticalGlue());
 			
 		}
 		
@@ -102,9 +107,56 @@ public class StartWindow extends JFrame {
 			add(PrepareDeck);
 			this.add(Box.createVerticalGlue());
 			add(ExitGame);
-			this.add(Box.createVerticalGlue());
 				
 		}
+		
+		private void initRadioButtons() {
+			
+			HighRes = new JRadioButton("Wysoka Rozdzielczoœæ");
+			SmallRes = new JRadioButton("Œrednia Rozdzielczoœæ");
+			
+			if(Values.DEFAULT_X==Values.X_SIZE_BIG) {
+				HighRes.setSelected(true);
+			}else {
+				SmallRes.setSelected(true);
+			}
+	
+		    ButtonGroup group = new ButtonGroup();
+		    group.add(HighRes);
+		    group.add(SmallRes);
+		    HighRes.setOpaque(false);
+		    SmallRes.setOpaque(false);
+		    HighRes.addActionListener(radioListener);
+		    SmallRes.addActionListener(radioListener);
+		    HighRes.setAlignmentX(Component.LEFT_ALIGNMENT);
+		    SmallRes.setAlignmentX(Component.LEFT_ALIGNMENT);
+		    this.add(HighRes);
+		    this.add(SmallRes);
+			
+		}
+		
+		private ActionListener radioListener = new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(e.getSource()==HighRes) {
+					StartGame.setEnabled(false);
+					PrepareDeck.setEnabled(false);
+					Values.setBiggerScreen();
+					GameInfo.resizeAllCards();
+					StartGame.setEnabled(true);
+					PrepareDeck.setEnabled(true);
+				}
+				if(e.getSource()==SmallRes) {
+					StartGame.setEnabled(false);
+					PrepareDeck.setEnabled(false);
+					Values.setSmallerScreen();
+					GameInfo.resizeAllCards();
+					StartGame.setEnabled(true);
+					PrepareDeck.setEnabled(true);
+				}
+			}
+		};
 		
 	}
 	

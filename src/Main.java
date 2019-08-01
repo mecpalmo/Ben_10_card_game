@@ -4,13 +4,19 @@ public class Main {
 
 	public static void main(String[] args) {
 		
+		LoadingWindow loading = new LoadingWindow();
+		loading.setVisible(true);
+		
 		GameInfo.createCardsLibrary();
 		
-		StartWindow myStartWindow = new StartWindow();
-		myStartWindow.setVisible(true);
+		loading.setVisible(false);
+		loading.dispose();
 		
-		//GameFrame myGameFrame = new GameFrame();
-		//myGameFrame.setVisible(true);
+		//StartWindow myStartWindow = new StartWindow();
+		//myStartWindow.setVisible(true);
+		
+		GameFrame test = new GameFrame();
+		test.setVisible(true);
 		
 	}
 

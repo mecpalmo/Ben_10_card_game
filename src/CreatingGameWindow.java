@@ -36,6 +36,7 @@ public class CreatingGameWindow extends JFrame{
 		this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
 		setVisible(true);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.setAlwaysOnTop(true);
 	}
 	
 	private void startGame() {

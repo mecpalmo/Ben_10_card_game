@@ -1,13 +1,13 @@
 
 public class Values {
 	
-	private static final int X_SIZE_BIG = 1545;
-	private static final int Y_SIZE_BIG = 1030;
-	private static final int X_SIZE_SMALL = 1080;
-	private static final int Y_SIZE_SMALL = 720;
+	public static final int X_SIZE_BIG = 1530;
+	public static final int Y_SIZE_BIG = 1030;
+	public static final int X_SIZE_SMALL = 1080;
+	public static final int Y_SIZE_SMALL = 720;
 	
-	public static int DEFAULT_X = X_SIZE_SMALL; // domyœlna szerokoœæ okna gry 1545 1080
-	public static int DEFAULT_Y = Y_SIZE_SMALL; // domyœlna wysokoœæ okna gry 1030 720
+	public static int DEFAULT_X = X_SIZE_BIG; // domyœlna szerokoœæ okna gry 1545 1080
+	public static int DEFAULT_Y = Y_SIZE_BIG; // domyœlna wysokoœæ okna gry 1030 720
 	public static int SIZE_VALUE = 0;  // 0 - mniejszy; 1 - wiêkszy
 	public static final int CARDS_AMOUNT = 80; //liczba dostêpnych kart
 	public static final int MAX_DECK_CAPACITY = 40; //rozmiar talii

@@ -53,7 +53,7 @@ public class Card {
 	}
 
 	private BufferedImage resizeCard(BufferedImage img, int newW, int newH) {
-		float ratio = (float) (198.0/1080.0);
+		float ratio = (float) (202.0/1080.0);
 		newH = (int)(newH * ratio);
 		newW = (int)Math.round(newH/CardRatio);
 	    Image tmp = img.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
