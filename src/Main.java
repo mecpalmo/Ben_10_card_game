@@ -12,11 +12,8 @@ public class Main {
 		loading.setVisible(false);
 		loading.dispose();
 		
-		//StartWindow myStartWindow = new StartWindow();
-		//myStartWindow.setVisible(true);
-		
-		GameFrame test = new GameFrame();
-		test.setVisible(true);
+		StartWindow myStartWindow = new StartWindow();
+		myStartWindow.setVisible(true);
 		
 	}
 

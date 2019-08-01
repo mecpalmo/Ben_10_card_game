@@ -12,7 +12,6 @@ public class LifeMeter {
 	private static BufferedImage CurrentFrameImage;
 	
 	private float FrameRatio;
-	private int shift = 0;
 	private int CurrentLifeIndex;
 	private static final int numOfPositions = 11;
 	
@@ -77,9 +76,9 @@ public class LifeMeter {
 	}
 	
 	private BufferedImage resizeCard(BufferedImage img, int newW, int newH) {
-		float ratio = (float) (41.0/1080.0);
+		float ratio = (float) (43.0/1080.0);
 		newH = (int)(newH * ratio);
-		newW = (int)Math.round((newH-shift)/FrameRatio);
+		newW = (int)Math.round((newH)/FrameRatio);
 	    Image tmp = img.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
 	    BufferedImage dimg = new BufferedImage(newW, newH, BufferedImage.TYPE_4BYTE_ABGR);
 

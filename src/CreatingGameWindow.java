@@ -1,6 +1,8 @@
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -59,16 +61,11 @@ public class CreatingGameWindow extends JFrame{
 		
 		CreatingGamePanel(){
 			setSize(sizex,sizey);
-			this.setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
-			setBackground(Color.BLUE);
-			this.add(Box.createVerticalGlue());
+			setLayout(null);
+			setBackground(Color.LIGHT_GRAY);
 			initRadioButtons();
-			this.add(Box.createVerticalGlue());
 			initTextField();
-			this.add(Box.createVerticalGlue());
 			initButtons();
-			this.add(Box.createVerticalGlue());
-			textField.setPreferredSize(new Dimension(150,30));
 		}
 		
 		private void initRadioButtons() {
@@ -77,31 +74,35 @@ public class CreatingGameWindow extends JFrame{
 			guestButton = new JRadioButton("Guest");
 			
 			hostButton.setSelected(true);
-
-		    //Group the radio buttons.
+			hostButton.setOpaque(false);
+			guestButton.setOpaque(false);
+			
+			Font myFont = new Font("Arial",Font.BOLD,16);
+			hostButton.setFont(myFont);
+			guestButton.setFont(myFont);
+			
+			int width = 90;
+			int height = 40;
+			hostButton.setBounds((int) ((sizex/2-width)/1.2), 40, width, height);
+			guestButton.setBounds((int) ((sizex/2-width)/3.3+sizex/2), 40, width, height);
+			
 		    ButtonGroup group = new ButtonGroup();
 		    group.add(hostButton);
 		    group.add(guestButton);
-
-		    //Register a listener for the radio buttons.
 		    hostButton.addActionListener(radioListener);
 		    guestButton.addActionListener(radioListener);
-		    
 		    this.add(hostButton);
 		    this.add(guestButton);
-		    hostButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-		    guestButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 		    
 		}
 		
 		private void initTextField() {
-			
 			textField = new JTextField();
 			textField.setEditable(false);
-			textField.setPreferredSize(new Dimension(150,30));
+			int width = 200;
+			int height = 30;
+			textField.setBounds((sizex-width)/2, (sizey-height)/2, width, height);
 			this.add(textField);
-			textField.setAlignmentX(Component.CENTER_ALIGNMENT);
-			
 		}
 		
 		private void initButtons() {
@@ -110,13 +111,12 @@ public class CreatingGameWindow extends JFrame{
 			confirmButton = new JButton("Zatwierdz");
 			backButton.addActionListener(buttonListener);
 			confirmButton.addActionListener(buttonListener);
-			
+			int width = 100;
+			int height = 30;
+			backButton.setBounds((sizex/2-width)/2, 300, width, height);
+			confirmButton.setBounds((sizex/2-width)/2+sizex/2, 300, width, height);
 			this.add(backButton);
-			backButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-			this.add(Box.createVerticalGlue());
 			this.add(confirmButton);
-			confirmButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-			
 		}
 		
 		public void saveIP() {

@@ -1,10 +1,10 @@
 
 public class Values {
 	
-	public static final int X_SIZE_BIG = 1530;
-	public static final int Y_SIZE_BIG = 1030;
-	public static final int X_SIZE_SMALL = 1080;
-	public static final int Y_SIZE_SMALL = 720;
+	public static final int X_SIZE_BIG = 1485;
+	public static final int Y_SIZE_BIG = 1000;
+	public static final int X_SIZE_SMALL = 1025;
+	public static final int Y_SIZE_SMALL = 690;
 	
 	public static int DEFAULT_X = X_SIZE_BIG; // domyœlna szerokoœæ okna gry 1545 1080
 	public static int DEFAULT_Y = Y_SIZE_BIG; // domyœlna wysokoœæ okna gry 1030 720
