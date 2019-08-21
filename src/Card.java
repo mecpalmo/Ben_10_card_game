@@ -22,6 +22,7 @@ public class Card {
 	
 	Card(int _id) {
 		String path;
+		
 		if(0<=_id && _id<51) {
 			path = "Images/Cards/C"+(_id+1)+".png";
 			id = "C"+(_id+1);
@@ -38,18 +39,26 @@ public class Card {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-	    try {
-			BackImage = ImageIO.read(new File("Images/Cards/Back.png"));
-		} catch (IOException e) {
-			e.printStackTrace();
+		
+		if(BackImage == null) {
+	    	try {
+	    		BackImage = ImageIO.read(new File("Images/Cards/Back.png"));
+	    	} catch (IOException e) {
+	    		e.printStackTrace();
+	    	}
 		}
+	    
 	    CardRatio = (float)FrontImage.getHeight()/(float)FrontImage.getWidth();
 	    setCurrentImages();
 	}
 	
 	public void setCurrentImages() {
 		CurrentFrontImage = resizeCard(FrontImage,Values.DEFAULT_X,Values.DEFAULT_Y);
-		CurrentBackImage = resizeCard(BackImage,Values.DEFAULT_X,Values.DEFAULT_Y);
+		if(CurrentBackImage == null) {
+			CurrentBackImage = resizeCard(BackImage,Values.DEFAULT_X,Values.DEFAULT_Y);
+		}else if(CurrentBackImage.getHeight()!=CurrentFrontImage.getHeight()) {
+			CurrentBackImage = resizeCard(BackImage,Values.DEFAULT_X,Values.DEFAULT_Y);
+		}
 	}
 
 	private BufferedImage resizeCard(BufferedImage img, int newW, int newH) {
@@ -89,4 +98,5 @@ public class Card {
 	public BufferedImage returnOriginalBackImage() {
 		return BackImage;
 	}
+	
 }

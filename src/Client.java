@@ -16,11 +16,14 @@ public class Client {
 	private String serverIP;
 	private Socket connection;
 	private boolean isConnected = false;
+	private boolean RUNNING = true;
+	private boolean SETSTREAMS = false;
 	
 	public Client(String host) {
 		isConnected = false;
 		serverIP = host;
 		chatWindow = new JTextArea();
+		SETSTREAMS = false;
 	}
 	
 	public void StartRunning() {
@@ -29,7 +32,7 @@ public class Client {
 			setupStreams();
 			whileChatting();
 		}catch(EOFException eofException) {
-			showMessage("\n Client terminated connection");
+			showMessage(Strings.s1);
 		}catch(IOException ioException) {
 			ioException.printStackTrace();
 		}finally {
@@ -38,16 +41,17 @@ public class Client {
 	}
 	
 	private void connectToServer() throws IOException{
-		showMessage("Attempting connection... \n");
+		showMessage(Strings.s2);
 		connection = new Socket(InetAddress.getByName(serverIP),Values.PORT);
-		showMessage("Connected to:"+connection.getInetAddress().getHostName());
+		showMessage(Strings.s3+connection.getInetAddress().getHostName());
 	}
 	
 	private void setupStreams() throws IOException{
 		output = new ObjectOutputStream(connection.getOutputStream());
 		output.flush();
 		input = new ObjectInputStream(connection.getInputStream());
-		showMessage("\n Dude your stream are now good to go! \n");
+		showMessage(Strings.s4);
+		SETSTREAMS = true;
 	}
 	
 	private void whileChatting() throws IOException{
@@ -58,20 +62,27 @@ public class Client {
 				//showMessage("\n" + message);
 				readMessage(message);
 			}catch(ClassNotFoundException classNotfoundException) {
-				showMessage("\n I don't know that object type");
+				showMessage(Strings.s5);
 			}
-		}while(!message.equals("SERVER - END"));
+		}while(!message.equals(Strings.s6) && RUNNING);
 		
 	}
 	
 	private void closeCrap() {
-		showMessage("\n closing crap down...");
+		showMessage(Strings.s7);
 		try {
 			output.close();
 			input.close();
 			connection.close();
 		}catch(IOException ioException) {
 			ioException.printStackTrace();
+		}
+	}
+	
+	public void closeConnection() {
+		RUNNING = false;
+		if(SETSTREAMS) {
+			closeCrap();
 		}
 	}
 	
@@ -88,7 +99,7 @@ public class Client {
 			output.flush();
 			//showMessage("\nCLIENT - " + message);
 		}catch(IOException ioException) {
-			chatWindow.append("\n something messed up sending message hoss");
+			chatWindow.append(Strings.s8);
 		}
 	}
 	
@@ -148,7 +159,7 @@ public class Client {
 		Values.OpponentsTransformationTime = StringToInt(mess.substring(len*2+8, len*2+10));
 	}
 	
-	public static JTextArea getTextArea() {
+	public JTextArea getTextArea() {
 		return chatWindow;
 	}
 }

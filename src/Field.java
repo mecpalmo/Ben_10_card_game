@@ -1,5 +1,3 @@
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
 public class Field {
@@ -38,7 +36,7 @@ public class Field {
 		CardID = _id;
 		Open = false;
 		if(RotateValue!=0) {
-			FieldImage = rotateImage(GameInfo.CardsLibrary[CardID].returnBackImage(),RotateValue);
+			FieldImage = GameInfo.rotateImage(GameInfo.CardsLibrary[CardID].returnBackImage(),RotateValue);
 		}else {
 			FieldImage = GameInfo.CardsLibrary[CardID].returnBackImage();
 		}
@@ -47,7 +45,7 @@ public class Field {
 	public void openCard() {
 		Open = true;
 		if(RotateValue!=0) {
-			FieldImage = rotateImage(GameInfo.CardsLibrary[CardID].returnFrontImage(),RotateValue);
+			FieldImage = GameInfo.rotateImage(GameInfo.CardsLibrary[CardID].returnFrontImage(),RotateValue);
 		}else {
 			FieldImage = GameInfo.CardsLibrary[CardID].returnFrontImage();
 		}
@@ -57,7 +55,7 @@ public class Field {
 	public void closeCard() {
 		Open = false;
 		if(RotateValue!=0) {
-			FieldImage = rotateImage(GameInfo.CardsLibrary[CardID].returnBackImage(),RotateValue);
+			FieldImage = GameInfo.rotateImage(GameInfo.CardsLibrary[CardID].returnBackImage(),RotateValue);
 		}else {
 			FieldImage = GameInfo.CardsLibrary[CardID].returnBackImage();
 		}
@@ -67,13 +65,13 @@ public class Field {
 		if(!Empty) {
 			if(Open) {
 				if(RotateValue!=0) {
-					FieldImage = rotateImage(GameInfo.CardsLibrary[CardID].returnFrontImage(),RotateValue);
+					FieldImage = GameInfo.rotateImage(GameInfo.CardsLibrary[CardID].returnFrontImage(),RotateValue);
 				}else {
 					FieldImage = GameInfo.CardsLibrary[CardID].returnFrontImage();
 				}
 			}else {
 				if(RotateValue!=0) {
-					FieldImage = rotateImage(GameInfo.CardsLibrary[CardID].returnBackImage(),RotateValue);
+					FieldImage = GameInfo.rotateImage(GameInfo.CardsLibrary[CardID].returnBackImage(),RotateValue);
 				}else {
 					FieldImage = GameInfo.CardsLibrary[CardID].returnBackImage();
 				}
@@ -130,22 +128,4 @@ public class Field {
 		}
 	}
 	
-	private static BufferedImage rotateImage(BufferedImage bimg, double angle) {
-		BufferedImage newImage;
-		AffineTransform tx = new AffineTransform();
-		int w = bimg.getWidth();
-		int h = bimg.getHeight();
-        if(angle==90 || angle==270) {
-        	tx.translate(h / 2, w / 2);
-            tx.rotate(Math.toRadians(angle));
-        	tx.translate(-w/2, -h/2);
-        }else {
-        	tx.translate(w/2, h/2);
-            tx.rotate(Math.toRadians(angle));
-        	tx.translate(-w/2, -h/2);
-        }
-		AffineTransformOp op = new AffineTransformOp(tx,AffineTransformOp.TYPE_BILINEAR);
-		newImage = op.filter(bimg, null);
-		return newImage;
-	}
 }

@@ -3,7 +3,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
@@ -12,17 +11,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.List;
 
-import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -31,20 +24,22 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 @SuppressWarnings("serial")
 public class CreatingDeckWindow extends JFrame{
 
 	private JButton ClearDeck, SaveDeck, ReturnToMenu;
 	private AllCardsPanel myAllCardsPanel;
+	JScrollPane ScrollAllCards;
 	
 	private int size_x, size_y;
 	
 	CreatingDeckWindow(){
-		super("Ben 10 Karciana Gra Kolekcjonerska - mecpalmoGames");
+		super(Strings.s11);
 		this.setBackground(Color.GRAY);
 		
-		size_x = (int) (Values.DEFAULT_X * 1.2);
+		size_x = (int) (Values.DEFAULT_X * 1.29);
 		size_y = Values.DEFAULT_Y;
 		
 		JFrame temp = new JFrame();
@@ -54,17 +49,15 @@ public class CreatingDeckWindow extends JFrame{
 		this.setSize(insets.left + size_x, insets.top + size_y);
 		setResizable(false);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		this.setAlwaysOnTop(true);
 		
 		myAllCardsPanel = new AllCardsPanel();
-		
-		JScrollPane ScrollAllCards = new JScrollPane(myAllCardsPanel);
+		ScrollAllCards = new JScrollPane(myAllCardsPanel);
 		ScrollAllCards.getVerticalScrollBar().setUnitIncrement(23);
 		add(ScrollAllCards);
+		preventScrollingIssue();
 		
-		//okno na œrodku ekranu
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
+		this.setLocation(dim.width/2-this.getSize().width/2, 0);
 	}
 	
 	private class AllCardsPanel extends JPanel{
@@ -74,8 +67,9 @@ public class CreatingDeckWindow extends JFrame{
 		private Graphics2D g2d;
 		private JLabel label;
 		
-		private final float RightPanelXRatio = 0.4f;
-		private final float SpaceRatio = 0.05f;
+		private final float RightPanelXRatio = 0.39f; // procentowa szerokoœæ czêœci panelu na w³asn¹ taliê
+		private final float SpaceRatio = 0.05f; // procentowy odstêp miêdzy kartami odnosz¹cy siê do rozmiaru karty
+		private final int MyDeckSpaceY = (int)(size_y*0.1);// odstêp pionowy od góry w³asnej talii
 		private int CardWidth, CardHeight, CardsInRow, CardsInRow2, space;
 		
 		private ShowBigCard ShowBigCardObject = new ShowBigCard();
@@ -84,7 +78,6 @@ public class CreatingDeckWindow extends JFrame{
 			
 			setLayout(null);
 			setBackground(Color.GREEN);
-			fields = new Field[Values.CARDS_AMOUNT];
 			CardWidth = GameInfo.CardsLibrary[0].returnBackImage().getWidth();
 			CardHeight = GameInfo.CardsLibrary[0].returnBackImage().getHeight();
 			
@@ -99,7 +92,7 @@ public class CreatingDeckWindow extends JFrame{
 			int Rows2 = (int) Math.ceil((double)deckFields.size()/(double)CardsInRow2);
 			int height2 = space+(Rows2*(space+CardHeight));
 					
-			setPreferredSize(new Dimension(size_x,Math.max(height,height2)));
+			setPreferredSize(new Dimension(size_x,Math.max(height,(height2+MyDeckSpaceY))));
 			
 			setFields();
 			setLabel();
@@ -115,6 +108,7 @@ public class CreatingDeckWindow extends JFrame{
 		}
 		
 		private void setFields() {
+			fields = new Field[Values.CARDS_AMOUNT];
 			for(int i=0; i<Values.CARDS_AMOUNT; i++) {
 				int x = space + (i%CardsInRow)*(CardWidth+space);
 				int y = (int) (space + Math.floor(i/CardsInRow)*(CardHeight+space));
@@ -125,31 +119,31 @@ public class CreatingDeckWindow extends JFrame{
 		}
 		
 		private void setLabel() {
-			label = new JLabel("Moja talia: ("+deckFields.size()+"/"+Values.MAX_DECK_CAPACITY+")");
-			Font myFont = new Font("Arial",Font.BOLD,(int)Math.round(size_y*(0.025)));
+			label = new JLabel(Strings.s12+deckFields.size()+"/"+Values.MAX_DECK_CAPACITY+")");
+			Font myFont = new Font(Values.FONT,Font.BOLD,(int)Math.round(size_y*(0.027)));
 			label.setFont(myFont);
 			label.setBounds((int)(size_x*(1-RightPanelXRatio)), (int)(size_y*0.015), (int)(size_x*0.2), (int)(size_y*0.05));
 			this.add(label);
 		}
 
 		private void setButtons() {
-			Font font = new Font("Arial",Font.BOLD,(int)Math.round(size_y*(0.02)));
+			Font font = new Font(Values.FONT,Font.BOLD,(int)Math.round(size_y*(0.02)));
 			int button_x = (int)(size_x*0.072);
 			int button_y = (int)(size_y*0.035);
 			
-			ReturnToMenu = new JButton("Cofnij");
+			ReturnToMenu = new JButton(Strings.s20);
 			ReturnToMenu.setBounds((int)(size_x*0.90),(int)(size_y*0.021),button_x,button_y);
 			ReturnToMenu.setFont(font);
 			ReturnToMenu.addActionListener(actList);
 			this.add(ReturnToMenu);
 			
-			ClearDeck = new JButton("Wyczyœæ");
+			ClearDeck = new JButton(Strings.s13);
 			ClearDeck.setBounds((int)(size_x*0.82),(int)(size_y*0.021),button_x,button_y);
 			ClearDeck.setFont(font);
 			ClearDeck.addActionListener(actList);
 			this.add(ClearDeck);
 			
-			SaveDeck = new JButton("Zapisz");
+			SaveDeck = new JButton(Strings.s14);
 			SaveDeck.setBounds((int)(size_x*0.74),(int)(size_y*0.021),button_x,button_y);
 			SaveDeck.setFont(font);
 			SaveDeck.addActionListener(actList);
@@ -163,7 +157,7 @@ public class CreatingDeckWindow extends JFrame{
 		}
 		
 		private void setBigCardPosition() {
-			ShowBigCardObject.setCoordinates((int)Math.round(size_x*(0.15)), (int)Math.round(size_y*(0.05)));
+			ShowBigCardObject.setCoordinates((int)Math.round(size_x*(0.18)), (int)Math.round(size_y*(0.05)));
 		}
 		
 		public void saveMyDeck() {
@@ -198,7 +192,7 @@ public class CreatingDeckWindow extends JFrame{
 					myFormatter.close();
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
-					JOptionPane.showMessageDialog(null, "B³¹d zapisu");
+					JOptionPane.showMessageDialog(null, Strings.s15);
 				}
 			}
 		}
@@ -236,13 +230,30 @@ public class CreatingDeckWindow extends JFrame{
 		}
 		
 		private void updateMyDeck() {
+			sortMyDeck();
 			for(int i=0; i<deckFields.size(); i++) {
 				int x2 = space + (i%CardsInRow2)*(CardWidth+space) + (int)(size_x*(1-RightPanelXRatio));
-				int y2 = (int)(space + Math.floor(i/CardsInRow2)*(CardHeight+space)) + (int)(size_y*0.1);
+				int y2 = (int)(space + Math.floor(i/CardsInRow2)*(CardHeight+space)) + MyDeckSpaceY;
 				deckFields.get(i).setPositions(x2, y2);
 			}
-			label.setText("Moja talia: ("+deckFields.size()+"/"+Values.MAX_DECK_CAPACITY+")");
+			label.setText(Strings.s12+deckFields.size()+"/"+Values.MAX_DECK_CAPACITY+")");
 			repaint();
+		}
+		
+		private void sortMyDeck() {
+			int n = deckFields.size();
+			do {
+				for(int i=0;i<n-1;i++) {
+					if(deckFields.get(i).getCardID() > deckFields.get(i+1).getCardID()) {
+						int id = deckFields.get(i).getCardID();
+						deckFields.get(i).addCard(deckFields.get(i+1).getCardID());
+						deckFields.get(i).openCard();
+						deckFields.get(i+1).addCard(id);
+						deckFields.get(i+1).openCard();
+					}
+				}
+				n = n-1;
+			}while(n > 1);	  
 		}
 		
 		protected void paintComponent(Graphics g) {
@@ -257,7 +268,7 @@ public class CreatingDeckWindow extends JFrame{
 	        	g2d.drawImage(deckFields.get(i).returnFieldImage(), deckFields.get(i).returnX(), deckFields.get(i).returnY(), this);
 	        }
 	        if(ShowBigCardObject.isShowing()) {
-				g2d.drawImage(ShowBigCardObject.getImage(), ShowBigCardObject.getX(), ShowBigCardObject.getY(), this);
+				g2d.drawImage(ShowBigCardObject.getImage(), ShowBigCardObject.getX(), ShowBigCardObject.getY()+ScrollAllCards.getVerticalScrollBar().getValue(), this);
 			}
 		}
 	
@@ -271,7 +282,7 @@ public class CreatingDeckWindow extends JFrame{
 						//klikniêcie we wszystkie karty
 						for(int i=0; i<fields.length;i++) {
 							if(arg0.getX()>fields[i].returnX() && arg0.getX()<fields[i].returnX()+CardWidth && arg0.getY()>fields[i].returnY() && arg0.getY()<fields[i].returnY()+CardHeight) {
-								PopUpWindow miniPop = new PopUpWindow(true, false, true);
+								PopUpWindow miniPop = new PopUpWindow(true, false);
 								miniPop.setCardID(i);
 								miniPop.show(arg0.getComponent(), arg0.getX(), arg0.getY());
 								break;
@@ -283,7 +294,7 @@ public class CreatingDeckWindow extends JFrame{
 						//klikniêcie w obecn¹ taliê
 						for(int i=0; i<deckFields.size();i++) {
 							if(arg0.getX()>deckFields.get(i).returnX() && arg0.getX()<deckFields.get(i).returnX()+CardWidth && arg0.getY()>deckFields.get(i).returnY() && arg0.getY()<deckFields.get(i).returnY()+CardHeight) {
-								PopUpWindow miniPop = new PopUpWindow(false, true, true);
+								PopUpWindow miniPop = new PopUpWindow(false, true);
 								miniPop.setOriginID(i);
 								miniPop.setCardID(deckFields.get(i).getCardID());
 								miniPop.show(arg0.getComponent(), arg0.getX(), arg0.getY());
@@ -292,6 +303,39 @@ public class CreatingDeckWindow extends JFrame{
 						}
 					}
 				}
+				
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				if(arg0.getButton()==MouseEvent.BUTTON1 && !ShowBigCardObject.isShowing()) {
+					if(arg0.getX()<(size_x*(1-RightPanelXRatio))) {
+						
+						//klikniêcie we wszystkie karty
+						for(int i=0; i<fields.length;i++) {
+							if(arg0.getX()>fields[i].returnX() && arg0.getX()<fields[i].returnX()+CardWidth && arg0.getY()>fields[i].returnY() && arg0.getY()<fields[i].returnY()+CardHeight) {
+								ShowBigCardObject.setImage(i);
+								ShowBigCardObject.setShowing(true);
+								ScrollAllCards.repaint();
+							}
+						}
+						
+					}else {
+						
+						//klikniêcie w obecn¹ taliê
+						for(int i=0; i<deckFields.size();i++) {
+							if(arg0.getX()>deckFields.get(i).returnX() && arg0.getX()<deckFields.get(i).returnX()+CardWidth && arg0.getY()>deckFields.get(i).returnY() && arg0.getY()<deckFields.get(i).returnY()+CardHeight) {
+								ShowBigCardObject.setImage(deckFields.get(i).getCardID());
+								ShowBigCardObject.setShowing(true);
+								ScrollAllCards.repaint();
+							}
+						}
+					}
+				}
+			}
+			
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
 				if(arg0.getButton()==MouseEvent.BUTTON1 && ShowBigCardObject.isShowing()) {
 					ShowBigCardObject.setShowing(false);
 					repaint();
@@ -306,12 +350,6 @@ public class CreatingDeckWindow extends JFrame{
 
 			@Override
 			public void mouseExited(MouseEvent arg0) {}
-
-			@Override
-			public void mousePressed(MouseEvent arg0) {}
-
-			@Override
-			public void mouseReleased(MouseEvent arg0) {}
 			
 			@Override
 			public void mouseDragged(MouseEvent arg0) {}
@@ -320,39 +358,24 @@ public class CreatingDeckWindow extends JFrame{
 		
 		private class PopUpWindow extends JPopupMenu {
 			
-			JMenuItem ShowCard;
 			JMenuItem AddCard;
 			JMenuItem RemoveCard;
 			
 			private int OriginID;
 			private int CardID;
 			
-			PopUpWindow(){
-				AddCard = new JMenuItem("Dodaj Kartê");
-				RemoveCard = new JMenuItem("Odrzuæ Kartê");
-				ShowCard = new JMenuItem("Poka¿ Kartê");
-				ShowCard.addActionListener(popList);
+			PopUpWindow(boolean a, boolean b){
 				AddCard.addActionListener(popList);
 				RemoveCard.addActionListener(popList);
-				OriginID = 0;
-				CardID = 0;
-			}
-			
-			PopUpWindow(boolean a, boolean b, boolean c){
 				if(a) {
-					AddCard = new JMenuItem("Dodaj Kartê");
+					AddCard = new JMenuItem(Strings.s16);
 					AddCard.addActionListener(popList);
 					add(AddCard);
 				}
 				if(b) {
-					RemoveCard = new JMenuItem("Odrzuæ Kartê");
+					RemoveCard = new JMenuItem(Strings.s17);
 					RemoveCard.addActionListener(popList);
 					add(RemoveCard);
-				}
-				if(c) {
-					ShowCard = new JMenuItem("Poka¿ Kartê");
-					ShowCard.addActionListener(popList);
-					add(ShowCard);
 				}
 				OriginID = 0;
 				CardID = 0;
@@ -370,11 +393,6 @@ public class CreatingDeckWindow extends JFrame{
 
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					if(arg0.getSource()==ShowCard) {
-						ShowBigCardObject.setImage(CardID);
-						ShowBigCardObject.setShowing(true);
-						repaint();
-					}
 					if(arg0.getSource()==AddCard) {
 						addCard(CardID);
 					}
@@ -418,4 +436,26 @@ public class CreatingDeckWindow extends JFrame{
 		this.dispose();
 	}
 	
+	private void preventScrollingIssue() {
+		
+		ScrollAllCards.getVerticalScrollBar().addAdjustmentListener(new java.awt.event.AdjustmentListener(){
+            public void adjustmentValueChanged(java.awt.event.AdjustmentEvent ae){
+                SwingUtilities.invokeLater(new Runnable(){
+                    public void run(){
+                        ScrollAllCards.repaint();
+                    }
+                });
+            }
+        });
+		
+        /*ScrollAllCards.getHorizontalScrollBar().addAdjustmentListener(new java.awt.event.AdjustmentListener(){
+            public void adjustmentValueChanged(java.awt.event.AdjustmentEvent ae){
+                SwingUtilities.invokeLater(new Runnable(){
+                    public void run(){
+                        ScrollAllCards.repaint();
+                    }
+                });
+            }
+        });*/
+	}
 }

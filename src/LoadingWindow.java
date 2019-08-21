@@ -18,9 +18,9 @@ public class LoadingWindow extends JFrame{
 	
 	LoadingWindow(){
 		
-		super("Patience <3");
+		super(Strings.s39);
 		this.setSize(size_x,size_y);
-		this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
 		this.setResizable(false);
@@ -33,9 +33,9 @@ public class LoadingWindow extends JFrame{
 	}
 	
 	private void setLabel() {
-		label = new JLabel("Loading...");
+		label = new JLabel(Strings.s38);
 		label.setAlignmentX(Component.CENTER_ALIGNMENT);
-		Font myFont = new Font("Arial",Font.BOLD,20);
+		Font myFont = new Font(Values.FONT,Font.BOLD,20);
 		label.setFont(myFont);
 		this.add(label);
 	}

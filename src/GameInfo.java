@@ -1,3 +1,6 @@
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -28,16 +31,12 @@ public class GameInfo {
 	
 	public static void shuffleMyCards() {
 		
-		// do skoñczenia
 		Integer[] temp = new Integer[Values.MAX_DECK_CAPACITY];
 		for(int i=0;i<temp.length;i++) {
 			temp[i] = MyCards[i];
 		}
-		
 		List<Integer> list = Arrays.asList(temp);
-		
 		Collections.shuffle(list);
-		
 		for(int i=0;i<temp.length;i++) {
 			MyCards[i] = list.get(i);
 		}
@@ -65,11 +64,30 @@ public class GameInfo {
 			reader.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(null, "Nie znaleziono zapisanej talii");
+			JOptionPane.showMessageDialog(null, Strings.s22);
 		} catch (IOException e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(null, "B³¹d wczytywania talii");
+			JOptionPane.showMessageDialog(null, Strings.s23);
 		}
 		
+	}
+	
+	public static BufferedImage rotateImage(BufferedImage bimg, double angle) {
+		BufferedImage newImage;
+		AffineTransform tx = new AffineTransform();
+		int w = bimg.getWidth();
+		int h = bimg.getHeight();
+        if(angle==90 || angle==270) {
+        	tx.translate(h / 2, w / 2);
+            tx.rotate(Math.toRadians(angle));
+        	tx.translate(-w/2, -h/2);
+        }else {
+        	tx.translate(w/2, h/2);
+            tx.rotate(Math.toRadians(angle));
+        	tx.translate(-w/2, -h/2);
+        }
+		AffineTransformOp op = new AffineTransformOp(tx,AffineTransformOp.TYPE_BILINEAR);
+		newImage = op.filter(bimg, null);
+		return newImage;
 	}
 }

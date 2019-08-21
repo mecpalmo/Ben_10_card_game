@@ -222,7 +222,7 @@ public class GamePanel extends JPanel{
 	
 	private void drawHover(Graphics2D g) {
 		if(HoverObject.isHovering()) {
-			g.drawImage(GameInfo.CardsLibrary[HoverObject.getCardID()].returnFrontImage(),HoverObject.getX(),HoverObject.getY(), this);
+			g.drawImage(HoverObject.getImage(),HoverObject.getX(),HoverObject.getY(), this);
 		}
 	}
 	
@@ -236,7 +236,6 @@ public class GamePanel extends JPanel{
 	private void drawAllRejected(Graphics2D g) {
 		if(RejectedViewerObject.isShowing()) {
 			g.drawImage(CurrentBackground, 0, 0, this);
-			//a tu ci¹g dalszy
 			int amount = MyRejected.size();
 			if(amount>0 && amount<=RejectedViewer.SingleRowCapacity()) {
 				drawFirstRow(amount, g);
@@ -436,7 +435,7 @@ public class GamePanel extends JPanel{
 	private void resizeWindow() {
 		ResizeButton.setEnabled(false);
 		timer.cancel();
-		Values.changeScreenSize(); //przed wszystkim, zmienia wartoœci DEFAULT_X i DEFAULT_Y
+		Values.changeScreenSize(); //zmienia wartoœci DEFAULT_X i DEFAULT_Y
 		
 		CurrentBoard = resizeImage(Board,Values.DEFAULT_X,Values.DEFAULT_Y);
 		CurrentBackground = resizeImage(Background,Values.DEFAULT_X,Values.DEFAULT_Y);
@@ -582,13 +581,13 @@ public class GamePanel extends JPanel{
 	}
 	
 	private void setLabels() {
-		MyStackInfo = new JLabel("Kart w talii: "+MyDeck.size());
+		MyStackInfo = new JLabel(Strings.s24+MyDeck.size());
 		MyStackInfo.setForeground(Color.WHITE);
-		MyTransformationInfo = new JLabel("Czas transformacji");
+		MyTransformationInfo = new JLabel(Strings.s25);
 		MyTransformationInfo.setForeground(Color.GREEN);
-		OpponentsStackInfo = new JLabel("Kart w talii: "+Values.OpponentsDeckSize);
+		OpponentsStackInfo = new JLabel(Strings.s24+Values.OpponentsDeckSize);
 		OpponentsStackInfo.setForeground(Color.WHITE);
-		OpponentsTransformationInfo = new JLabel("Czas transformacji");
+		OpponentsTransformationInfo = new JLabel(Strings.s25);
 		OpponentsTransformationInfo.setForeground(Color.GREEN);
 		MyTransformationValue = new JLabel(Integer.toString(TransformationTime));
 		OpponentsTransformationValue = new JLabel(Integer.toString(Values.OpponentsTransformationTime));
@@ -602,8 +601,8 @@ public class GamePanel extends JPanel{
 	}
 	
 	private void updateLabels() {
-		MyStackInfo.setText("Kart w talii: "+MyDeck.size());
-		OpponentsStackInfo.setText("Kart w talii: "+Values.OpponentsDeckSize);
+		MyStackInfo.setText(Strings.s24+MyDeck.size());
+		OpponentsStackInfo.setText(Strings.s24+Values.OpponentsDeckSize);
 		MyTransformationValue.setText(Integer.toString(TransformationTime));
 		OpponentsTransformationValue.setText(Integer.toString(Values.OpponentsTransformationTime));
 		if(TransformationTime<1) {
@@ -620,8 +619,8 @@ public class GamePanel extends JPanel{
 	}
 	
 	private void setLabelsPositions() {
-		Font LabelsFont = new Font("Arial",Font.BOLD,(int)Math.round(Values.DEFAULT_Y*(0.017)));
-		Font bigFont = new Font("Arial",Font.BOLD,(int)Math.round(Values.DEFAULT_Y*(0.09)));
+		Font LabelsFont = new Font(Values.FONT,Font.BOLD,(int)Math.round(Values.DEFAULT_Y*(0.017)));
+		Font bigFont = new Font(Values.FONT,Font.BOLD,(int)Math.round(Values.DEFAULT_Y*(0.09)));
 		MyStackInfo.setFont(LabelsFont);
 		MyTransformationInfo.setFont(LabelsFont);
 		OpponentsStackInfo.setFont(LabelsFont);
@@ -637,7 +636,7 @@ public class GamePanel extends JPanel{
 	}
 	
 	private void setButtons() {
-		Font font = new Font("Arial",Font.BOLD,(int)Math.round(Values.DEFAULT_Y*(0.015)));
+		Font font = new Font(Values.FONT,Font.BOLD,(int)Math.round(Values.DEFAULT_Y*(0.015)));
 		AddingTransTime = new JButton("+");
 		AddingTransTime.setFont(font);
 		AddingTransTime.setEnabled(true);
@@ -656,14 +655,14 @@ public class GamePanel extends JPanel{
 		DecreasingTransTime.addActionListener(actList);
 		DecreasingTransTime.setFocusable(false);
 		
-		ResizeButton = new JButton("Zmieñ Rozdzielczoœæ");
+		ResizeButton = new JButton(Strings.s26);
 		ResizeButton.setEnabled(true);
 		ResizeButton.setBackground(Color.WHITE);
 		ResizeButton.setMargin(null);
 		ResizeButton.setFocusable(false);
 		ResizeButton.addActionListener(actList);
 		
-		EndGame = new JButton("Zakoñcz grê");
+		EndGame = new JButton(Strings.s27);
 		EndGame.setEnabled(true);
 		EndGame.setBackground(Color.WHITE);
 		EndGame.setMargin(null);
@@ -688,14 +687,13 @@ public class GamePanel extends JPanel{
 	}
 	
 	private void setConnectionElements() {
-		myScrollPane = new JScrollPane();
 		myTextArea = new JTextArea();
-		CloseConnectionButton = new JButton("Zamknij Po³¹czenie");
-		ResetConnectionButton = new JButton("Zresetuj Po³¹czenie");
+		myScrollPane = new JScrollPane(myTextArea);
+		CloseConnectionButton = new JButton(Strings.s28);
+		ResetConnectionButton = new JButton(Strings.s29);
 		setConnectionElementsPositions();
 		CloseConnectionButton.addActionListener(actList);
 		ResetConnectionButton.addActionListener(actList);
-		myScrollPane.add(myTextArea);
 		this.add(myScrollPane);
 		this.add(CloseConnectionButton);
 		this.add(ResetConnectionButton);
@@ -703,9 +701,9 @@ public class GamePanel extends JPanel{
 	
 	private void updateScrollPane() {
 		if(Values.HOST) {
-			myTextArea = myServer.getTextArea();
+			myTextArea.setText(myServer.getTextArea().getText());
 		}else {
-			myTextArea = myClient.getTextArea();
+			myTextArea.setText(myClient.getTextArea().getText());
 		}
 	}
 	
@@ -751,11 +749,35 @@ public class GamePanel extends JPanel{
 	};
 	
 	private void closeConnection() {
-		
+		if(Values.HOST) {
+        	myServer.closeConnection();
+        }else {
+        	myClient.closeConnection();
+        }
 	}
 	
 	private void resetConnection() {
-		
+		if(Values.HOST) {
+        	myServer.closeConnection();
+        	myServer = new Server();
+        	Thread t = new Thread(new Runnable() {
+    			@Override
+    			public void run() {
+    				myServer.startRunning();
+    			}
+    		});
+        	t.start();
+        }else {
+        	myClient.closeConnection();
+        	myClient = new Client(Values.IP_ADRESS);
+        	Thread t = new Thread(new Runnable() {
+    			@Override
+    			public void run() {
+    				myClient.StartRunning();
+    			}
+    		});
+        	t.start();
+        }
 	}
 	
 	private void setLifeMeters() {
@@ -833,13 +855,9 @@ public class GamePanel extends JPanel{
 
 		@Override
 		public void mouseDragged(MouseEvent arg0) {
-			
 			if(HoverObject.isHovering()) {
-				
-				dragHoverUpdate(arg0);
-				
+				dragHoverUpdate(arg0);	
 			}
-			
 		}
 
 		@Override
@@ -891,16 +909,6 @@ public class GamePanel extends JPanel{
 		}
 
 		@Override
-		public void mouseEntered(MouseEvent arg0) {
-			
-		}
-
-		@Override
-		public void mouseExited(MouseEvent arg0) {
-			
-		}
-
-		@Override
 		public void mousePressed(MouseEvent arg0) {
 			
 			if(!ShowBigCardObject.isShowing() && !RejectedViewerObject.isShowing()) {	
@@ -915,12 +923,16 @@ public class GamePanel extends JPanel{
 
 		@Override
 		public void mouseReleased(MouseEvent arg0) {
-			
 			if(HoverObject.isHovering()) {
 				releaseHoveringCard(arg0);
 			}
-			
 		}
+		
+		@Override
+		public void mouseEntered(MouseEvent arg0) {}
+
+		@Override
+		public void mouseExited(MouseEvent arg0) {}
 		
 		private void checkOpponentsFields(MouseEvent event) {
 			if(event.getButton()==MouseEvent.BUTTON3) {
@@ -1231,13 +1243,15 @@ public class GamePanel extends JPanel{
 				int y = event.getY();
 				int width = GameInfo.CardsLibrary[0].returnFrontImage().getWidth();
 				int height = GameInfo.CardsLibrary[0].returnFrontImage().getHeight();
-				if((x>=MyHand.focusedX() && x<=(MyHand.focusedX()+width)) && (y>=MyHand.ShowY() && y<=CurrentBoard.getHeight())) {
-					HoverObject.setCardID(MyHand.getCard(MyHand.getIndexOfFocus()));
+				if((x>=MyHand.focusedX() && x<=(MyHand.focusedX()+width)) && (y>=MyHand.ShowY() && y<=MyHand.ShowY()+height)) {
 					HoverObject.setDifferences(MyHand.focusedX(),MyHand.ShowY(), x, y);
+					HoverObject.setCardID(MyHand.getCard(MyHand.getIndexOfFocus()));
+					HoverObject.setWasOpen(false);
+					HoverObject.setWasHit(false);
+					HoverObject.setOriginID(Values.HAND_ID);
+					HoverObject.setImage();
 					HoverObject.setHovering(true);
 					MyHand.removeCard(MyHand.getIndexOfFocus());
-					HoverObject.setOriginID(Values.HAND_ID);
-					HoverObject.setWasOpen(false);
 				}
 			}
 		}
@@ -1296,28 +1310,31 @@ public class GamePanel extends JPanel{
 			if(BoardFields[index].isEmpty()) {
 				if(BoardFields[index+1].isEmpty()) {
 					// nie ma ¿adnej dolnej
-					BoardFields[index].addCard(HoverObject.getCardID());
-					if(HoverObject.wasOpen()) {
-						BoardFields[index].openCard();
+					if(HoverObject.wasHit()) {
+						BoardFields[index+1].addCard(HoverObject.getCardID());
+						if(HoverObject.wasOpen()) {
+							BoardFields[index+1].openCard();
+						}
+					}else {
+						BoardFields[index].addCard(HoverObject.getCardID());
+						if(HoverObject.wasOpen()) {
+							BoardFields[index].openCard();
+						}
 					}
 				}else {
 					// dolna uszkodzona
 					if(BoardFields[index+2].isEmpty() && BoardFields[index+3].isEmpty()) {
 						//nie ma ¿adnej górnej
-						BoardFields[index+2].addCard(HoverObject.getCardID());
-						BoardFields[index+2].openCard();
+						if(HoverObject.wasHit()) {
+							BoardFields[index+3].addCard(HoverObject.getCardID());
+							BoardFields[index+3].openCard();
+						}else {
+							BoardFields[index+2].addCard(HoverObject.getCardID());
+							BoardFields[index+2].openCard();
+						}
 					}else {
 						//jest górna
-						if(HoverObject.OriginID()==Values.HAND_ID) {
-							MyHand.addCard(HoverObject.getCardID());
-						}else if(HoverObject.OriginID()==Values.REJECTED_ID){
-							MyRejected.addCard(HoverObject.getCardID());
-						}else {
-							BoardFields[HoverObject.OriginID()].addCard(HoverObject.getCardID());
-							if(HoverObject.wasOpen()) {
-								BoardFields[HoverObject.OriginID()].openCard();
-							}
-						}
+						backToSource();
 					}
 				}
 			}else {
@@ -1325,32 +1342,33 @@ public class GamePanel extends JPanel{
 				if(BoardFields[index+2].isEmpty() && BoardFields[index+3].isEmpty()) {
 					//nie ma ¿adnej górnej
 					if(BoardFields[index].isOpen()) {
-						BoardFields[index+2].addCard(HoverObject.getCardID());
-						BoardFields[index+2].openCard();
-					}else {
-						if(HoverObject.OriginID()==Values.HAND_ID) {
-							MyHand.addCard(HoverObject.getCardID());
-						}else if(HoverObject.OriginID()==Values.REJECTED_ID){
-							MyRejected.addCard(HoverObject.getCardID());
+						if(HoverObject.wasHit()) {
+							BoardFields[index+3].addCard(HoverObject.getCardID());
+							BoardFields[index+3].openCard();
 						}else {
-							BoardFields[HoverObject.OriginID()].addCard(HoverObject.getCardID());
-							if(HoverObject.wasOpen()) {
-								BoardFields[HoverObject.OriginID()].openCard();
-							}
+							BoardFields[index+2].addCard(HoverObject.getCardID());
+							BoardFields[index+2].openCard();
 						}
+					}else {
+						backToSource();
 					}
 				}else {
 					//jest górna
-					if(HoverObject.OriginID()==Values.HAND_ID) {
-						MyHand.addCard(HoverObject.getCardID());
-					}else if(HoverObject.OriginID()==Values.REJECTED_ID){
-						MyRejected.addCard(HoverObject.getCardID());
-					}else {
-						BoardFields[HoverObject.OriginID()].addCard(HoverObject.getCardID());
-						if(HoverObject.wasOpen()) {
-							BoardFields[HoverObject.OriginID()].openCard();
-						}
-					}
+					backToSource();
+				}
+			}
+		}
+		
+		//zwrot niesionej karty do zrod³a
+		private void backToSource() {
+			if(HoverObject.OriginID()==Values.HAND_ID) {
+				MyHand.addCard(HoverObject.getCardID());
+			}else if(HoverObject.OriginID()==Values.REJECTED_ID){
+				MyRejected.addCard(HoverObject.getCardID());
+			}else {
+				BoardFields[HoverObject.OriginID()].addCard(HoverObject.getCardID());
+				if(HoverObject.wasOpen()) {
+					BoardFields[HoverObject.OriginID()].openCard();
 				}
 			}
 		}
@@ -1359,14 +1377,20 @@ public class GamePanel extends JPanel{
 		private void liftCardFromField(int index, int x, int y) {
 			HoverObject.setCardID(BoardFields[index].getCardID());
 			HoverObject.setDifferences(BoardFields[index].returnX(),BoardFields[index].returnY(), x, y);
-			HoverObject.setHovering(true);
 			if(BoardFields[index].isOpen()) {
 				HoverObject.setWasOpen(true);
 			}else {
 				HoverObject.setWasOpen(false);
 			}
-			BoardFields[index].removeCard();
+			if(index % 2 == 1) {
+				HoverObject.setWasHit(true);
+			}else {
+				HoverObject.setWasHit(false);
+			}
 			HoverObject.setOriginID(index);
+			HoverObject.setImage();
+			HoverObject.setHovering(true);
+			BoardFields[index].removeCard();
 		}
 		
 		//pokaz lub ukryj reke
@@ -1543,83 +1567,53 @@ public class GamePanel extends JPanel{
 		
 		private int OriginID;
 		private int CardID;
-		private int x;
-		private int y;
-		
-		
-		PopUpWindow(){
-			ShowCard = new JMenuItem("Poka¿ Kartê");
-			OpenCard = new JMenuItem("Otwórz Kartê");
-			CloseCard = new JMenuItem("Zamknij Kartê");
-			HealCard = new JMenuItem("Ulecz Postaæ");
-			DamageCard = new JMenuItem("Zadaj uszkodzenie");
-			ReturnToHandFromField = new JMenuItem("Zwróæ kartê do rêki");
-			DrawFromDeck = new JMenuItem("Dobierz Kartê");
-			ShowRejected = new JMenuItem("Poka¿ Odrzucone Karty");
-			ReturnToHandFromRejected = new JMenuItem("Zwróæ kartê do rêki");
-			ShowCard.addActionListener(popList);
-			OpenCard.addActionListener(popList);
-			CloseCard.addActionListener(popList);
-			HealCard.addActionListener(popList);
-			DamageCard.addActionListener(popList);
-			ReturnToHandFromField.addActionListener(popList);
-			DrawFromDeck.addActionListener(popList);
-			ShowRejected.addActionListener(popList);
-			ReturnToHandFromRejected.addActionListener(popList);
-			x = 0;
-			y = 0;
-			OriginID = 0;
-			CardID = 0;
-		}
 		
 		PopUpWindow(boolean a, boolean b, boolean c, boolean d, boolean e, boolean f, boolean g, boolean h, boolean i){
 			if(a) {
-				ShowCard = new JMenuItem("Poka¿ Kartê");
+				ShowCard = new JMenuItem(Strings.s30);
 				ShowCard.addActionListener(popList);
 				add(ShowCard);
 			}
 			if(b) {
-				OpenCard = new JMenuItem("Otwórz Kartê");
+				OpenCard = new JMenuItem(Strings.s32);
 				OpenCard.addActionListener(popList);
 				add(OpenCard);
 			}
 			if(c) {
-				CloseCard = new JMenuItem("Zamknij Kartê");
+				CloseCard = new JMenuItem(Strings.s31);
 				CloseCard.addActionListener(popList);
 				add(CloseCard);
 			}
 			if(d) {
-				HealCard = new JMenuItem("Ulecz Postaæ");
+				HealCard = new JMenuItem(Strings.s33);
 				HealCard.addActionListener(popList);
 				add(HealCard);
 			}
 			if(e) {
-				DamageCard = new JMenuItem("Zadaj uszkodzenie");
+				DamageCard = new JMenuItem(Strings.s34);
 				DamageCard.addActionListener(popList);
 				add(DamageCard);
 			}
 			if(f) {
-				ReturnToHandFromField = new JMenuItem("Zwróæ kartê do rêki");
+				ReturnToHandFromField = new JMenuItem(Strings.s35);
 				ReturnToHandFromField.addActionListener(popList);
 				add(ReturnToHandFromField);
 			}
 			if(g) {
-				DrawFromDeck = new JMenuItem("Dobierz Kartê");
+				DrawFromDeck = new JMenuItem(Strings.s36);
 				DrawFromDeck.addActionListener(popList);
 				add(DrawFromDeck);
 			}
 			if(h) {
-				ShowRejected = new JMenuItem("Poka¿ Odrzucone Karty");
+				ShowRejected = new JMenuItem(Strings.s37);
 				ShowRejected.addActionListener(popList);
 				add(ShowRejected);
 			}
 			if(i) {
-				ReturnToHandFromRejected = new JMenuItem("Zwróæ kartê do rêki");
+				ReturnToHandFromRejected = new JMenuItem(Strings.s35);
 				ReturnToHandFromRejected.addActionListener(popList);
 				add(ReturnToHandFromRejected);
 			}
-			x = 0;
-			y = 0;
 			OriginID = 0;
 			CardID = 0;
 		}
@@ -1630,14 +1624,6 @@ public class GamePanel extends JPanel{
 		
 		public void setCardID(int id) {
 			CardID = id;
-		}
-		
-		public void setX(int _x) {
-			x = _x;
-		}
-		
-		public void setY(int _y) {
-			y = _y;
 		}
 		
 		private ActionListener popList = new ActionListener() {

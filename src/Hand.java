@@ -1,5 +1,3 @@
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -140,25 +138,7 @@ public class Hand {
 	}
 	
 	public static void setOpponentsHandCard() {
-		OpponentsHandCard = rotateImage(GameInfo.CardsLibrary[0].returnBackImage(),180);
+		OpponentsHandCard = GameInfo.rotateImage(GameInfo.CardsLibrary[0].returnBackImage(),180);
 	}
 	
-	private static BufferedImage rotateImage(BufferedImage bimg, double angle) {
-		BufferedImage newImage;
-		AffineTransform tx = new AffineTransform();
-		int w = bimg.getWidth();
-		int h = bimg.getHeight();
-        if(angle==90 || angle==270) {
-        	tx.translate(h / 2, w / 2);
-            tx.rotate(Math.toRadians(angle));
-        	tx.translate(-w/2, -h/2);
-        }else {
-        	tx.translate(w/2, h/2);
-            tx.rotate(Math.toRadians(angle));
-        	tx.translate(-w/2, -h/2);
-        }
-		AffineTransformOp op = new AffineTransformOp(tx,AffineTransformOp.TYPE_BILINEAR);
-		newImage = op.filter(bimg, null);
-		return newImage;
-	}
 }

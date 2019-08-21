@@ -1,5 +1,3 @@
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -104,7 +102,7 @@ public class Stack {
 	
 	public void setImage(BufferedImage bi) {
 		if(RotateValue==180) {
-			TopImage = rotateImage(bi,RotateValue);
+			TopImage = GameInfo.rotateImage(bi,RotateValue);
 		}else {
 			TopImage = bi;
 		}
@@ -113,29 +111,11 @@ public class Stack {
 	public void updateFrontImage() {
 		if(Cards.size()>0) {
 			if(RotateValue==180) {
-				TopImage = rotateImage(GameInfo.CardsLibrary[Cards.get(Cards.size()-1)].returnFrontImage(),RotateValue);
+				TopImage = GameInfo.rotateImage(GameInfo.CardsLibrary[Cards.get(Cards.size()-1)].returnFrontImage(),RotateValue);
 			}else {
 				TopImage = GameInfo.CardsLibrary[Cards.get(Cards.size()-1)].returnFrontImage();
 			}
 		}
 	}
 	
-	private static BufferedImage rotateImage(BufferedImage bimg, double angle) {
-		BufferedImage newImage;
-		AffineTransform tx = new AffineTransform();
-		int w = bimg.getWidth();
-		int h = bimg.getHeight();
-        if(angle==90 || angle==270) {
-        	tx.translate(h / 2, w / 2);
-            tx.rotate(Math.toRadians(angle));
-        	tx.translate(-w/2, -h/2);
-        }else {
-        	tx.translate(w/2, h/2);
-            tx.rotate(Math.toRadians(angle));
-        	tx.translate(-w/2, -h/2);
-        }
-		AffineTransformOp op = new AffineTransformOp(tx,AffineTransformOp.TYPE_BILINEAR);
-		newImage = op.filter(bimg, null);
-		return newImage;
-	}
 }

@@ -20,25 +20,20 @@ public class StartWindow extends JFrame {
 
 	int size_x = 550;
 	int size_y = 400;
-	
-	int button_x = 100;
-	int button_y = 30;
 
 	JButton StartGame, PrepareDeck, ExitGame;
 	
 	StartWindow(){
-		super("Ben 10 Karciana Gra Kolekcjonerska - mecpalmoGames");
+		super(Strings.s11);
 		this.setSize(size_x,size_y);
 		setResizable(false);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		this.setAlwaysOnTop(true);
 		
 		StartPanel myStartPanel = new StartPanel();
 		this.add(myStartPanel);
 		
 		GameInfo.loadDeckFromFile();
 		
-		//okno na œrodku ekranu
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
 	}
@@ -65,13 +60,13 @@ public class StartWindow extends JFrame {
 		
 		private void initLabels() {
 			
-			titleLabel = new JLabel("Ben 10");
-			Font font1 = new Font("Verdana",Font.BOLD,45);
+			titleLabel = new JLabel(Strings.s40);
+			Font font1 = new Font(Values.FONT,Font.BOLD,50);
 			titleLabel.setFont(font1);
 			titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 			
-			subTitleLabel = new JLabel("Karciana Gra Kolekcjonerska");
-			Font font2 = new Font("Verdana",Font.BOLD,20);
+			subTitleLabel = new JLabel(Strings.s41);
+			Font font2 = new Font(Values.FONT,Font.BOLD,25);
 			subTitleLabel.setFont(font2);
 			subTitleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 			
@@ -82,25 +77,25 @@ public class StartWindow extends JFrame {
 		
 		private void initButtons() {
 			
-			Font font = new Font("Verdana",Font.BOLD,14);
+			Font font = new Font(Values.FONT,Font.BOLD,14);
 			
-			StartGame = new JButton("Rozpocznij Grê");
+			StartGame = new JButton(Strings.s42);
 			StartGame.addActionListener(actList);
-			StartGame.setSize(button_x, button_y);
 			StartGame.setAlignmentX(Component.CENTER_ALIGNMENT);
 			StartGame.setFont(font);
+			StartGame.setFocusable(false);
 			
-			PrepareDeck = new JButton("Stwórz taliê do gry");
+			PrepareDeck = new JButton(Strings.s43);
 			PrepareDeck.addActionListener(actList);
-			PrepareDeck.setSize(button_x, button_y);
 			PrepareDeck.setAlignmentX(Component.CENTER_ALIGNMENT);
 			PrepareDeck.setFont(font);
+			PrepareDeck.setFocusable(false);
 			
-			ExitGame = new JButton("Wyjdz");
+			ExitGame = new JButton(Strings.s44);
 			ExitGame.addActionListener(actList);
-			ExitGame.setSize(button_x, button_y);
 			ExitGame.setAlignmentX(Component.CENTER_ALIGNMENT);
 			ExitGame.setFont(font);
+			ExitGame.setFocusable(false);
 			
 			add(StartGame);
 			this.add(Box.createVerticalGlue());
@@ -112,8 +107,8 @@ public class StartWindow extends JFrame {
 		
 		private void initRadioButtons() {
 			
-			HighRes = new JRadioButton("Wysoka Rozdzielczoœæ");
-			SmallRes = new JRadioButton("Œrednia Rozdzielczoœæ");
+			HighRes = new JRadioButton(Strings.s45);
+			SmallRes = new JRadioButton(Strings.s46);
 			
 			if(Values.DEFAULT_X==Values.X_SIZE_BIG) {
 				HighRes.setSelected(true);

@@ -1,14 +1,10 @@
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -29,7 +25,7 @@ public class CreatingGameWindow extends JFrame{
 	CreatingGamePanel menuPanel;
 	
 	CreatingGameWindow(){
-		super("Ben 10 Karciana Gra Kolekcjonerska - mecpalmoGames");
+		super(Strings.s11);
 		setSize(sizex,sizey);
 		setResizable(false);
 		menuPanel = new CreatingGamePanel();
@@ -70,14 +66,14 @@ public class CreatingGameWindow extends JFrame{
 		
 		private void initRadioButtons() {
 			
-			hostButton = new JRadioButton("Host");
-			guestButton = new JRadioButton("Guest");
+			hostButton = new JRadioButton(Strings.s18);
+			guestButton = new JRadioButton(Strings.s19);
 			
 			hostButton.setSelected(true);
 			hostButton.setOpaque(false);
 			guestButton.setOpaque(false);
 			
-			Font myFont = new Font("Arial",Font.BOLD,16);
+			Font myFont = new Font(Values.FONT,Font.BOLD,16);
 			hostButton.setFont(myFont);
 			guestButton.setFont(myFont);
 			
@@ -107,11 +103,11 @@ public class CreatingGameWindow extends JFrame{
 		
 		private void initButtons() {
 			
-			backButton = new JButton("Cofnij");
-			confirmButton = new JButton("Zatwierdz");
+			backButton = new JButton(Strings.s20);
+			confirmButton = new JButton(Strings.s21);
 			backButton.addActionListener(buttonListener);
 			confirmButton.addActionListener(buttonListener);
-			int width = 100;
+			int width = 130;
 			int height = 30;
 			backButton.setBounds((sizex/2-width)/2, 300, width, height);
 			confirmButton.setBounds((sizex/2-width)/2+sizex/2, 300, width, height);

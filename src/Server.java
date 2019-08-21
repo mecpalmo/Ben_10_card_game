@@ -15,10 +15,14 @@ public class Server{
 	private ServerSocket server;
 	private Socket connection;
 	private boolean isConnected = false;
+	private boolean RUNNING;
+	private boolean SETSTREAMS = false;
 	
 	public Server(){
 		isConnected = false;
 		chatWindow = new JTextArea();
+		RUNNING = true;
+		SETSTREAMS = false;
 	}
 	
 	public void startRunning() {
@@ -30,7 +34,7 @@ public class Server{
 					setUpStream();
 					whileChatting();
 				}catch(EOFException eofException) {
-					showMessage("\n Server Ended the connection!");
+					showMessage(Strings.s9);
 				}finally {
 					closeCrap();
 				}
@@ -41,40 +45,50 @@ public class Server{
 	}
 	
 	private void waitForConnection() throws IOException {
-		showMessage("Waiting for someone to connect... \n");
+		showMessage(Strings.s10);
 		connection = server.accept();
-		showMessage("Now connected to "+connection.getInetAddress().getHostName());
+		showMessage(Strings.s3+connection.getInetAddress().getHostName());
 	}
 	
 	private void setUpStream() throws IOException{
 		output = new ObjectOutputStream(connection.getOutputStream());
 		output.flush();
 		input = new ObjectInputStream(connection.getInputStream());
-		showMessage("\n Streams are now setup! \n");
+		showMessage(Strings.s4);
+		SETSTREAMS = true;
 	}
 	
 	private void whileChatting() throws IOException {
-		String message = "You are now connected! ";
+		String message = "";
 		isConnected = true;
-		
-		//sendMessage(message);
 		do {
 			try {
 				message = (String)input.readObject();
-				//showMessage("\n "+ message);
 				readMessage(message);
 			}catch(ClassNotFoundException classNotFoundException) {
-				showMessage("\n idk wtf that user sent!");
+				showMessage(Strings.s5);
 			}
-		}while(!message.equals("CLIENT - END"));
+		}while(!message.equals(Strings.s6) && RUNNING);
 	}
 	
 	private void closeCrap() {
-		showMessage("\n Closing connections... \n");
+		showMessage(Strings.s7);
 		try {
 			output.close();
 			input.close();
 			connection.close();
+		}catch(IOException ioException) {
+			ioException.printStackTrace();
+		}
+	}
+	
+	public void closeConnection() {
+		RUNNING = false;
+		if(SETSTREAMS) {
+			closeCrap();
+		}
+		try {
+			server.close();
 		}catch(IOException ioException) {
 			ioException.printStackTrace();
 		}
@@ -91,9 +105,8 @@ public class Server{
 		try {
 			output.writeObject(message);
 			output.flush();
-			//showMessage("\nSERVER - "+ message);
 		}catch(IOException ioException) {
-			chatWindow.append("\n ERROR: DUDE I CANT SEND THAT MESSAGE");
+			chatWindow.append(Strings.s8);
 		}
 	}
 	
@@ -116,7 +129,7 @@ public class Server{
 		temp = temp + intToString(Values.MyLifeIndex);
 		temp = temp + intToString(Values.MyTopRejectedValue);
 		temp = temp + intToString(Values.MyTransformationTime);
-		System.out.println(temp); /////
+		System.out.println(temp);
 		return temp;
 	}
 	
@@ -153,7 +166,8 @@ public class Server{
 		Values.OpponentsTransformationTime = StringToInt(mess.substring(len*2+8, len*2+10));
 	}
 	
-	public static JTextArea getTextArea() {
+	public JTextArea getTextArea() {
 		return chatWindow;
 	}
+	
 }

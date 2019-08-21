@@ -9,19 +9,16 @@ public class GameFrame extends JFrame{
 	
 	GameFrame(){
 		
-		super("Ben 10 Karciana Gra Kolekcjonerska - mecpalmoGames");
-		
+		super(Strings.s11);
 		setWindowSize();
 		
 		GamePanel myGamePanel = new GamePanel(this);
 		add(myGamePanel);
 		setResizable(false);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		this.setAlwaysOnTop(true);
 		
-		//okno na srodku ekranu
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
+		this.setLocation(dim.width/2-this.getSize().width/2, 0);
 		
 	}
 	

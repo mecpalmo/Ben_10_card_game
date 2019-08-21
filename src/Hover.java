@@ -1,3 +1,4 @@
+import java.awt.image.BufferedImage;
 
 public class Hover {
 
@@ -11,6 +12,8 @@ public class Hover {
 	private int CardID;
 	private int OriginID;
 	private boolean wasOpen; //do przemieszczania z pól bitwy, czy przemieszczona karta by³a otwarta
+	private boolean wasHit; // do przemierszczenia z pól bitwy, czy przemieszczona karta by³a uszkodzona
+	private BufferedImage HoverImage;
 	
 	Hover(){
 		
@@ -21,6 +24,7 @@ public class Hover {
 		Hovering = false;
 		OriginID = Values.HAND_ID;
 		wasOpen = false;
+		wasHit = false;
 		
 	}
 	
@@ -75,4 +79,25 @@ public class Hover {
 	public boolean wasOpen() {
 		return wasOpen;
 	}
+	
+	public void setWasHit(boolean is) {
+		wasHit = is;
+	}
+	
+	public boolean wasHit() {
+		return wasHit;
+	}
+	
+	public void setImage() {
+		if(wasHit==true) {
+			HoverImage = GameInfo.rotateImage(GameInfo.CardsLibrary[CardID].returnFrontImage(),90);
+		}else {
+			HoverImage = GameInfo.CardsLibrary[CardID].returnFrontImage();
+		}
+	}
+	
+	public BufferedImage getImage() {
+		return HoverImage;
+	}
+	
 }

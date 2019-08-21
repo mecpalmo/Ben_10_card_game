@@ -68,14 +68,14 @@ public class LifeMeter {
 	}
 	
 	public void setCurrentImage() {
-		CurrentFrameImage = resizeCard(FrameImage,Values.DEFAULT_X,Values.DEFAULT_Y);
+		CurrentFrameImage = resizeFrame(FrameImage,Values.DEFAULT_X,Values.DEFAULT_Y);
 	}
 	
 	public BufferedImage returnFrameImage() {
 		return CurrentFrameImage;
 	}
 	
-	private BufferedImage resizeCard(BufferedImage img, int newW, int newH) {
+	private BufferedImage resizeFrame(BufferedImage img, int newW, int newH) {
 		float ratio = (float) (43.0/1080.0);
 		newH = (int)(newH * ratio);
 		newW = (int)Math.round((newH)/FrameRatio);
