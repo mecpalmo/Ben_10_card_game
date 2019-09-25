@@ -2,10 +2,17 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -22,10 +29,16 @@ public class StartWindow extends JFrame {
 	int size_y = 400;
 
 	JButton StartGame, PrepareDeck, ExitGame;
+	private BufferedImage Background;
 	
 	StartWindow(){
 		super(Strings.s11);
-		this.setSize(size_x,size_y);
+		setBackground();
+		if(Background != null) {
+			this.setSize(Background.getWidth(),Background.getHeight());
+		}else {
+			this.setSize(size_x, size_y);
+		}
 		setResizable(false);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		
@@ -38,16 +51,31 @@ public class StartWindow extends JFrame {
 		this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
 	}
 	
+	private void setBackground() {
+		try {
+			Background = ImageIO.read(new File("Images/startBackground.png"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	private class StartPanel extends JPanel{
 		
-		JLabel titleLabel, subTitleLabel;
-		JRadioButton HighRes, SmallRes;
+		private JLabel titleLabel, subTitleLabel;
+		private JRadioButton HighRes, SmallRes;
+		private Graphics2D g2d;
 		
 		StartPanel(){
 			
-			setSize(size_x,size_y);
+			if(Background != null) {
+				this.setSize(Background.getWidth(),Background.getHeight());
+				repaint();
+			}else {
+				this.setSize(size_x, size_y);
+				setBackground(Color.GREEN);
+			}
 			this.setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
-			setBackground(Color.GREEN);
 			this.add(Box.createVerticalGlue());
 			initLabels();
 			this.add(Box.createVerticalGlue());
@@ -61,13 +89,15 @@ public class StartWindow extends JFrame {
 		private void initLabels() {
 			
 			titleLabel = new JLabel(Strings.s40);
-			Font font1 = new Font(Values.FONT,Font.BOLD,50);
+			Font font1 = new Font("Comic Sans MS",Font.BOLD,60);
 			titleLabel.setFont(font1);
+			titleLabel.setForeground(Color.BLACK);
 			titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 			
 			subTitleLabel = new JLabel(Strings.s41);
-			Font font2 = new Font(Values.FONT,Font.BOLD,25);
+			Font font2 = new Font("Comic Sans MS",Font.BOLD,25);
 			subTitleLabel.setFont(font2);
+			subTitleLabel.setForeground(Color.BLACK);
 			subTitleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 			
 			add(titleLabel);
@@ -77,7 +107,7 @@ public class StartWindow extends JFrame {
 		
 		private void initButtons() {
 			
-			Font font = new Font(Values.FONT,Font.BOLD,14);
+			Font font = new Font(Values.FONT2,Font.BOLD,14);
 			
 			StartGame = new JButton(Strings.s42);
 			StartGame.addActionListener(actList);
@@ -128,6 +158,16 @@ public class StartWindow extends JFrame {
 		    this.add(HighRes);
 		    this.add(SmallRes);
 			
+		}
+		
+		protected void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			g2d = (Graphics2D) g;
+			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+	        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			if(Background != null) {
+				g2d.drawImage(Background, 0, 0, this);
+			}
 		}
 		
 		private ActionListener radioListener = new ActionListener() {

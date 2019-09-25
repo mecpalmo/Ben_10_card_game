@@ -21,7 +21,8 @@ public class Values {
 	public static final int PERIOD = 33; // czas odœwie¿ania ekranu gry [ms]
 	public static final int SEVER_PERIOD = 1000; // czas odœwie¿ania serwera [ms]
 	
-	public static final String FONT = "Comic Sans MS";
+	public static final String FONT = "Arial";
+	public static final String FONT2 = "Comic Sans MS";
 	
 	public static int[] OpponentsFieldsValues;
 	public static int OpponentsDeckSize;

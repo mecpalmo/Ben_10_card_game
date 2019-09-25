@@ -14,16 +14,16 @@ public class Strings {
 	
 	public static final String s11 = "Ben 10 Karciana Gra Kolekcjonerska - by MecPalmo";
 	public static final String s12 = "Moja talia: (";
-	public static final String s13 = "WYCZYŒÆ";
-	public static final String s14 = "ZAPISZ";
+	public static final String s13 = "Wyczyœæ";
+	public static final String s14 = "Zapisz";
 	public static final String s15 = "B³¹d zapisu";
 	public static final String s16 = "Dodaj Kartê";
 	public static final String s17 = "Odrzuæ Kartê";
 	
 	public static final String s18 = "HOST";
 	public static final String s19 = "GOŒÆ";
-	public static final String s20 = "COFNIJ";
-	public static final String s21 = "ZATWIERDZ";
+	public static final String s20 = "Cofnij";
+	public static final String s21 = "Zatwierdz";
 	public static final String s22 = "Nie znaleziono zapisanej talii";
 	public static final String s23 = "B³¹d wczytywania talii";
 	public static final String s24 = "Kart w talii: ";

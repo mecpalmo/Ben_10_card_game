@@ -3,6 +3,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
@@ -11,11 +12,15 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -39,14 +44,14 @@ public class CreatingDeckWindow extends JFrame{
 		super(Strings.s11);
 		this.setBackground(Color.GRAY);
 		
-		size_x = (int) (Values.DEFAULT_X * 1.29);
+		size_x = (int) (Values.DEFAULT_X * 1.265);
 		size_y = Values.DEFAULT_Y;
 		
 		JFrame temp = new JFrame();
 		temp.pack();
 		Insets insets = temp.getInsets();
 		temp = null;
-		this.setSize(insets.left + size_x, insets.top + size_y);
+		this.setSize(insets.left + size_x + insets.right + insets.right, insets.top + size_y);
 		setResizable(false);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		
@@ -66,11 +71,12 @@ public class CreatingDeckWindow extends JFrame{
 		private List<Field> deckFields = new ArrayList<Field>();
 		private Graphics2D g2d;
 		private JLabel label;
+		private BufferedImage Background;
 		
-		private final float RightPanelXRatio = 0.39f; // procentowa szerokoœæ czêœci panelu na w³asn¹ taliê
+		private final float RightPanelXRatio = 0.38f; // procentowa szerokoœæ czêœci panelu na w³asn¹ taliê
 		private final float SpaceRatio = 0.05f; // procentowy odstêp miêdzy kartami odnosz¹cy siê do rozmiaru karty
 		private final int MyDeckSpaceY = (int)(size_y*0.1);// odstêp pionowy od góry w³asnej talii
-		private int CardWidth, CardHeight, CardsInRow, CardsInRow2, space;
+		private int CardWidth, CardHeight, CardsInRow, CardsInRow2, space, panelHeight;
 		
 		private ShowBigCard ShowBigCardObject = new ShowBigCard();
 		
@@ -92,8 +98,10 @@ public class CreatingDeckWindow extends JFrame{
 			int Rows2 = (int) Math.ceil((double)deckFields.size()/(double)CardsInRow2);
 			int height2 = space+(Rows2*(space+CardHeight));
 					
-			setPreferredSize(new Dimension(size_x,Math.max(height,(height2+MyDeckSpaceY))));
+			panelHeight = Math.max(height,(height2+MyDeckSpaceY));
+			setPreferredSize(new Dimension(size_x,panelHeight));
 			
+			setBackground();
 			setFields();
 			setLabel();
 			setButtons();
@@ -104,7 +112,21 @@ public class CreatingDeckWindow extends JFrame{
 			HandlerClass handler = new HandlerClass();
 	        this.addMouseListener(handler);
 	        this.addMouseMotionListener(handler);
-			
+	        
+	        System.out.println("Szerokoœæ: "+size_x+" Height: "+Math.max(height,(height2+MyDeckSpaceY)));
+	        System.out.println("Pierwsza: "+(fields[CardsInRow-1].returnX()+CardWidth)+" Druga: "+deckFields.get(0).returnX());
+		}
+		
+		private void setBackground() {
+			try {
+				Background = ImageIO.read(new File("Images/deckBackground.png"));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if(Background.getWidth() != size_x || Background.getHeight() < panelHeight) {
+				Background = resizeImage(Background, size_x, panelHeight);
+			}
 		}
 		
 		private void setFields() {
@@ -120,31 +142,32 @@ public class CreatingDeckWindow extends JFrame{
 		
 		private void setLabel() {
 			label = new JLabel(Strings.s12+deckFields.size()+"/"+Values.MAX_DECK_CAPACITY+")");
-			Font myFont = new Font(Values.FONT,Font.BOLD,(int)Math.round(size_y*(0.027)));
+			Font myFont = new Font(Values.FONT,Font.BOLD,(int)Math.round(size_y*(0.026)));
 			label.setFont(myFont);
-			label.setBounds((int)(size_x*(1-RightPanelXRatio)), (int)(size_y*0.015), (int)(size_x*0.2), (int)(size_y*0.05));
+			label.setForeground(Color.WHITE);
+			label.setBounds((int)(size_x*(1-RightPanelXRatio))+(5*space), (int)(size_y*0.015), (int)(size_x*0.2), (int)(size_y*0.05));
 			this.add(label);
 		}
 
 		private void setButtons() {
-			Font font = new Font(Values.FONT,Font.BOLD,(int)Math.round(size_y*(0.02)));
+			Font font = new Font(Values.FONT,Font.BOLD,(int)Math.round(size_y*(0.018)));
 			int button_x = (int)(size_x*0.072);
 			int button_y = (int)(size_y*0.035);
 			
 			ReturnToMenu = new JButton(Strings.s20);
-			ReturnToMenu.setBounds((int)(size_x*0.90),(int)(size_y*0.021),button_x,button_y);
+			ReturnToMenu.setBounds((int)(size_x*0.92),(int)(size_y*0.021),button_x,button_y);
 			ReturnToMenu.setFont(font);
 			ReturnToMenu.addActionListener(actList);
 			this.add(ReturnToMenu);
 			
 			ClearDeck = new JButton(Strings.s13);
-			ClearDeck.setBounds((int)(size_x*0.82),(int)(size_y*0.021),button_x,button_y);
+			ClearDeck.setBounds((int)(size_x*0.84),(int)(size_y*0.021),button_x,button_y);
 			ClearDeck.setFont(font);
 			ClearDeck.addActionListener(actList);
 			this.add(ClearDeck);
 			
 			SaveDeck = new JButton(Strings.s14);
-			SaveDeck.setBounds((int)(size_x*0.74),(int)(size_y*0.021),button_x,button_y);
+			SaveDeck.setBounds((int)(size_x*0.76),(int)(size_y*0.021),button_x,button_y);
 			SaveDeck.setFont(font);
 			SaveDeck.addActionListener(actList);
 			this.add(SaveDeck);
@@ -261,6 +284,8 @@ public class CreatingDeckWindow extends JFrame{
 			g2d = (Graphics2D) g;
 			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+	        
+	        g2d.drawImage(Background,0,0,this);
 	        for(int i=0; i<fields.length; i++) {
 	        	g2d.drawImage(fields[i].returnFieldImage(), fields[i].returnX(), fields[i].returnY(), this);
 	        }
@@ -270,6 +295,15 @@ public class CreatingDeckWindow extends JFrame{
 	        if(ShowBigCardObject.isShowing()) {
 				g2d.drawImage(ShowBigCardObject.getImage(), ShowBigCardObject.getX(), ShowBigCardObject.getY()+ScrollAllCards.getVerticalScrollBar().getValue(), this);
 			}
+		}
+		
+		private BufferedImage resizeImage(BufferedImage img, int newW, int newH) {
+		    Image tmp = img.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
+		    BufferedImage dimg = new BufferedImage(newW, newH, BufferedImage.TYPE_4BYTE_ABGR);
+		    Graphics2D g2d = dimg.createGraphics();
+		    g2d.drawImage(tmp, 0, 0, null);
+		    g2d.dispose();
+		    return dimg;
 		}
 	
 		private class HandlerClass implements MouseListener, MouseMotionListener{
@@ -317,6 +351,7 @@ public class CreatingDeckWindow extends JFrame{
 								ShowBigCardObject.setImage(i);
 								ShowBigCardObject.setShowing(true);
 								ScrollAllCards.repaint();
+								break;
 							}
 						}
 						
@@ -328,6 +363,7 @@ public class CreatingDeckWindow extends JFrame{
 								ShowBigCardObject.setImage(deckFields.get(i).getCardID());
 								ShowBigCardObject.setShowing(true);
 								ScrollAllCards.repaint();
+								break;
 							}
 						}
 					}

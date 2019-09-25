@@ -636,9 +636,7 @@ public class GamePanel extends JPanel{
 	}
 	
 	private void setButtons() {
-		Font font = new Font(Values.FONT,Font.BOLD,(int)Math.round(Values.DEFAULT_Y*(0.015)));
 		AddingTransTime = new JButton("+");
-		AddingTransTime.setFont(font);
 		AddingTransTime.setEnabled(true);
 		AddingTransTime.setBackground(Color.WHITE);
 		AddingTransTime.setMargin(null);
@@ -647,7 +645,6 @@ public class GamePanel extends JPanel{
 		AddingTransTime.setFocusable(false);
 		
 		DecreasingTransTime = new JButton("-");
-		DecreasingTransTime.setFont(font);
 		DecreasingTransTime.setEnabled(true);
 		DecreasingTransTime.setBackground(Color.WHITE);
 		DecreasingTransTime.setMargin(null);
@@ -684,6 +681,14 @@ public class GamePanel extends JPanel{
 		int ResButHeight = (int)Math.round(Values.DEFAULT_Y*(0.017));
 		ResizeButton.setBounds(Values.DEFAULT_X-ResButWidth, 0, ResButWidth, ResButHeight);
 		EndGame.setBounds(Values.DEFAULT_X-ResButWidth-ResButWidth, 0, ResButWidth, ResButHeight);
+		
+		Font font = new Font(Values.FONT,Font.BOLD,(int)Math.round(Values.DEFAULT_Y*(0.015)));
+		DecreasingTransTime.setFont(font);
+		AddingTransTime.setFont(font);
+		
+		Font font2 = new Font(Values.FONT,Font.BOLD,(int)Math.round(Values.DEFAULT_Y*(0.012)));
+		ResizeButton.setFont(font2);
+		EndGame.setFont(font2);
 	}
 	
 	private void setConnectionElements() {
@@ -711,6 +716,12 @@ public class GamePanel extends JPanel{
 		CloseConnectionButton.setBounds((int)Math.round(Values.DEFAULT_X*(0.888)), (int)Math.round(Values.DEFAULT_Y*(0.58)), (int)Math.round(Values.DEFAULT_X*(0.105)), (int)Math.round(Values.DEFAULT_Y*(0.03)));
 		ResetConnectionButton.setBounds((int)Math.round(Values.DEFAULT_X*(0.783)), (int)Math.round(Values.DEFAULT_Y*(0.58)), (int)Math.round(Values.DEFAULT_X*(0.105)), (int)Math.round(Values.DEFAULT_Y*(0.03)));
 		myScrollPane.setBounds((int)Math.round(Values.DEFAULT_X*(0.783)), (int)Math.round(Values.DEFAULT_Y*(0.41)), (int)Math.round(Values.DEFAULT_X*(0.21)), (int)Math.round(Values.DEFAULT_Y*(0.17)));
+		
+		Font font = new Font(Values.FONT,Font.BOLD,(int)Math.round(Values.DEFAULT_Y*(0.011)));
+		CloseConnectionButton.setFont(font);
+		ResetConnectionButton.setFont(font);
+		Font font2 = new Font(Values.FONT,Font.PLAIN,(int)Math.round(Values.DEFAULT_Y*(0.014)));
+		myTextArea.setFont(font2);
 	}
 	
 	private ActionListener actList = new ActionListener() {
