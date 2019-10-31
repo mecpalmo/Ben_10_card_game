@@ -149,10 +149,8 @@ public class CreatingDeckWindow extends JFrame{
 			    }
 			  }
 			}
-			
 			String[] List = new String[list.size()];
 			list.toArray(List);
-			
 			comboBox = new JComboBox<String>(List);
 			comboBox.setSelectedIndex(0);
 			GameInfo.loadSpecificDeck((String)comboBox.getSelectedItem());
@@ -163,6 +161,7 @@ public class CreatingDeckWindow extends JFrame{
 		
 		public void updateComboList() {
 			comboBox.addItem(deckName);
+			comboBox.setSelectedIndex(comboBox.getItemCount()-1);
 		}
 		
  		private void setFields() {
@@ -512,12 +511,12 @@ public class CreatingDeckWindow extends JFrame{
 		    
 		    public void actionPerformed(ActionEvent e) {
 		        JComboBox cb = (JComboBox)e.getSource();
-		        
 		        String x = (String)cb.getSelectedItem();
 		        if(x != deckName) {
 		        deckName = x;
 		        GameInfo.loadSpecificDeck(deckName);
 		        readDeck();
+		        saveToGame();
 		        repaint();
 		        }
 		    }
