@@ -78,7 +78,7 @@ public class CreatingDeckWindow extends JFrame{
 		
 		private final float RightPanelXRatio = 0.38f; // procentowa szerokoœæ czêœci panelu na w³asn¹ taliê
 		private final float SpaceRatio = 0.05f; // procentowy odstêp miêdzy kartami odnosz¹cy siê do rozmiaru karty
-		private final int MyDeckSpaceY = (int)(size_y*0.13);// odstêp pionowy od góry w³asnej talii
+		private final int MyDeckSpaceY = (int)(size_y*0.12);// odstêp pionowy od góry w³asnej talii
 		private int CardWidth, CardHeight, CardsInRow, CardsInRow2, space, panelHeight;
 		
 		private ShowBigCard ShowBigCardObject = new ShowBigCard();
@@ -117,8 +117,6 @@ public class CreatingDeckWindow extends JFrame{
 	        this.addMouseListener(handler);
 	        this.addMouseMotionListener(handler);
 	        
-	        System.out.println("Szerokoœæ: "+size_x+" Height: "+Math.max(height,(height2+MyDeckSpaceY)));
-	        System.out.println("Pierwsza: "+(fields[CardsInRow-1].returnX()+CardWidth)+" Druga: "+deckFields.get(0).returnX());
 		}
 		
 		private void setBackground() {
