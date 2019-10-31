@@ -44,7 +44,36 @@ public class GameInfo {
 	}
 	
 	public static void loadDeckFromFile() {
-		String fileName = "Deck\\Deck.txt";
+		String fileName = "Deck\\Default.txt";
+		//fileName = JOptionPane.showInputDialog("Podaj nazwê pliku");
+		
+		BufferedReader reader;
+		FileReader feader;
+		try {
+			feader = new FileReader(fileName);
+			reader = new BufferedReader(feader);
+			for(int i=0; i<Values.MAX_DECK_CAPACITY; i++) {
+				String id = reader.readLine();
+				if(id == null) {
+					break;
+				}else {
+					int ID = Integer.parseInt(id);
+					MyCards[i] = ID;
+				}
+			}
+			reader.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, Strings.s22);
+		} catch (IOException e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, Strings.s23);
+		}
+		
+	}
+	
+	public static void loadSpecificDeck(String name) {
+		String fileName = "Deck\\"+name+".txt";
 		//fileName = JOptionPane.showInputDialog("Podaj nazwê pliku");
 		
 		BufferedReader reader;

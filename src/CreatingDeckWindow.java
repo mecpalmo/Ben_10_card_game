@@ -22,6 +22,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -34,7 +35,7 @@ import javax.swing.SwingUtilities;
 @SuppressWarnings("serial")
 public class CreatingDeckWindow extends JFrame{
 
-	private JButton ClearDeck, SaveDeck, ReturnToMenu;
+	private JButton ClearDeck, SaveDeck, ReturnToMenu, CreateNewDeck;
 	private AllCardsPanel myAllCardsPanel;
 	JScrollPane ScrollAllCards;
 	
@@ -72,10 +73,12 @@ public class CreatingDeckWindow extends JFrame{
 		private Graphics2D g2d;
 		private JLabel label;
 		private BufferedImage Background;
+		private JComboBox<String> comboBox;
+		private String deckName;
 		
 		private final float RightPanelXRatio = 0.38f; // procentowa szerokoœæ czêœci panelu na w³asn¹ taliê
 		private final float SpaceRatio = 0.05f; // procentowy odstêp miêdzy kartami odnosz¹cy siê do rozmiaru karty
-		private final int MyDeckSpaceY = (int)(size_y*0.1);// odstêp pionowy od góry w³asnej talii
+		private final int MyDeckSpaceY = (int)(size_y*0.13);// odstêp pionowy od góry w³asnej talii
 		private int CardWidth, CardHeight, CardsInRow, CardsInRow2, space, panelHeight;
 		
 		private ShowBigCard ShowBigCardObject = new ShowBigCard();
@@ -105,6 +108,7 @@ public class CreatingDeckWindow extends JFrame{
 			setFields();
 			setLabel();
 			setButtons();
+			setComboBox();
 			setBigCardObject();
 			readDeck();
 			repaint();
@@ -129,7 +133,39 @@ public class CreatingDeckWindow extends JFrame{
 			}
 		}
 		
-		private void setFields() {
+		private void setComboBox() {
+			File folder = new File("Deck\\");
+			File[] listOfFiles = folder.listFiles();
+			ArrayList<String> list = new ArrayList<String>();
+			
+			for (int i = 0; i < listOfFiles.length; i++) {
+			  if (listOfFiles[i].isFile()) {
+			    String name = listOfFiles[i].getName();
+			    if (name.contains(".txt")) {
+			    	name = name.replace(".txt", "");
+			    	if(!name.contains("Default")) {
+			    		list.add(name);
+			    	}
+			    }
+			  }
+			}
+			
+			String[] List = new String[list.size()];
+			list.toArray(List);
+			
+			comboBox = new JComboBox<String>(List);
+			comboBox.setSelectedIndex(0);
+			GameInfo.loadSpecificDeck((String)comboBox.getSelectedItem());
+			comboBox.setBounds((int)(size_x*0.875),(int)(size_y*0.065), (int)(size_x*0.117), (int)(size_y*0.035));
+			comboBox.addActionListener(new ComboBoxListener());
+			this.add(comboBox);
+		}
+		
+		public void updateComboList() {
+			comboBox.addItem(deckName);
+		}
+		
+ 		private void setFields() {
 			fields = new Field[Values.CARDS_AMOUNT];
 			for(int i=0; i<Values.CARDS_AMOUNT; i++) {
 				int x = space + (i%CardsInRow)*(CardWidth+space);
@@ -172,6 +208,11 @@ public class CreatingDeckWindow extends JFrame{
 			SaveDeck.addActionListener(actList);
 			this.add(SaveDeck);
 			
+			CreateNewDeck = new JButton("Utwórz now¹ taliê");
+			CreateNewDeck.setBounds((int)(size_x*0.76),(int)(size_y*0.065),(int)(button_x*1.5),button_y);
+			CreateNewDeck.setFont(font);
+			CreateNewDeck.addActionListener(actList);
+			this.add(CreateNewDeck);
 		}
 		
 		private void setBigCardObject() {
@@ -186,6 +227,7 @@ public class CreatingDeckWindow extends JFrame{
 		public void saveMyDeck() {
 			saveToGame();
 			saveToFile();
+			saveNewFile();
 		}
 		
 		private void saveToGame() {
@@ -200,7 +242,31 @@ public class CreatingDeckWindow extends JFrame{
 			if(deckFields.size()==Values.MAX_DECK_CAPACITY) {
 				//String fileName = JOptionPane.showInputDialog("Podaj nazwê pliku do zapisu (bez rozszerzenia)");
 				
-				String fileName = "Deck\\Deck.txt";
+				String fileName = "Deck\\Default.txt";
+				String newline = System.getProperty("line.separator");
+				
+				try {
+					Formatter myFormatter = new Formatter(fileName);
+					for(int i=0;i<deckFields.size();i++) {
+						String line = Integer.toString(deckFields.get(i).getCardID());
+						myFormatter.format(line);
+						if(i!=deckFields.size()-1) {
+							myFormatter.format(newline);
+						}
+					}
+					myFormatter.close();
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+					JOptionPane.showMessageDialog(null, Strings.s15);
+				}
+			}
+		}
+		
+		private void saveNewFile() {
+			if(deckFields.size()==Values.MAX_DECK_CAPACITY && deckName.length()>0) {
+				//String fileName = JOptionPane.showInputDialog("Podaj nazwê pliku do zapisu (bez rozszerzenia)");
+				
+				String fileName = "Deck\\"+deckName+".txt";
 				String newline = System.getProperty("line.separator");
 				
 				try {
@@ -277,6 +343,10 @@ public class CreatingDeckWindow extends JFrame{
 				}
 				n = n-1;
 			}while(n > 1);	  
+		}
+		
+		public void setDeckName(String name) {
+			deckName = name;
 		}
 		
 		protected void paintComponent(Graphics g) {
@@ -401,8 +471,6 @@ public class CreatingDeckWindow extends JFrame{
 			private int CardID;
 			
 			PopUpWindow(boolean a, boolean b){
-				AddCard.addActionListener(popList);
-				RemoveCard.addActionListener(popList);
 				if(a) {
 					AddCard = new JMenuItem(Strings.s16);
 					AddCard.addActionListener(popList);
@@ -439,6 +507,21 @@ public class CreatingDeckWindow extends JFrame{
 				
 		    };
 		}
+	
+		private class ComboBoxListener implements ActionListener {
+		    
+		    public void actionPerformed(ActionEvent e) {
+		        JComboBox cb = (JComboBox)e.getSource();
+		        
+		        String x = (String)cb.getSelectedItem();
+		        if(x != deckName) {
+		        deckName = x;
+		        GameInfo.loadSpecificDeck(deckName);
+		        readDeck();
+		        repaint();
+		        }
+		    }
+		}
 	}
 	
 	private ActionListener actList = new ActionListener() {
@@ -453,6 +536,9 @@ public class CreatingDeckWindow extends JFrame{
 			}
 			if(e.getSource()==ReturnToMenu) {
 				returnToMenu();
+			}
+			if(e.getSource()==CreateNewDeck) {
+				createNewDeck();
 			}
 		}
 	};
@@ -470,6 +556,16 @@ public class CreatingDeckWindow extends JFrame{
 		StartWindow newStart = new StartWindow();
 		newStart.setVisible(true);
 		this.dispose();
+	}
+	
+	private void createNewDeck() {
+		String filename = "";
+		while(filename.length() <=0 || filename.contains("Default")) {
+			filename = JOptionPane.showInputDialog("Podaj nazwê nowej talii (nie mo¿e zawieraæ \"Default\")");
+		}
+		myAllCardsPanel.setDeckName(filename);
+		myAllCardsPanel.updateComboList();
+		myAllCardsPanel.saveMyDeck();
 	}
 	
 	private void preventScrollingIssue() {
