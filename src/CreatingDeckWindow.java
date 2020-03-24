@@ -150,6 +150,8 @@ public class CreatingDeckWindow extends JFrame{
 			String[] List = new String[list.size()];
 			list.toArray(List);
 			comboBox = new JComboBox<String>(List);
+			Font font = new Font(Values.FONT,Font.BOLD,(int)Math.round(size_y*(0.017)));
+			comboBox.setFont(font);
 			if(comboBox.getItemCount()>0) {
 				comboBox.setSelectedIndex(0);
 				GameInfo.loadSpecificDeck((String)comboBox.getSelectedItem());

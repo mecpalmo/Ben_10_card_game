@@ -2,7 +2,7 @@
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
-  <jar>C:\Users\MecPalmo\Documents\Programowanie\Java\Ben10\Ben10 v1.31.jar</jar>
+  <jar>C:\Users\MecPalmo\Documents\Programowanie\Java\Ben10\Ben10 v1.311.jar</jar>
   <outfile>C:\Users\MecPalmo\Documents\Programowanie\Java\Ben10\Ben10.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>

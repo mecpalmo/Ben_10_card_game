@@ -1,0 +1,27 @@
+
+
+Version:	3.12
+CmdLine:	C:\Users\MecPalmo\Documents\Programowanie\Java\Ben10\Ben10.exe --l4j-debug
+WOW64:		yes
+Working dir:	C:\Users\MecPalmo\Documents\Programowanie\Java\Ben10\.
+Java min ver:	1.008.000
+Java max ver:	
+64-bit search:	SOFTWARE\JavaSoft\Java Runtime Environment...
+Check:		SOFTWARE\JavaSoft\Java Runtime Environment\1.8
+Check launcher:	C:\Program Files\Java\jre1.8.0_181\bin\javaw.exe (OK)
+Match:		1.008.000
+Check:		SOFTWARE\JavaSoft\Java Runtime Environment\1.8.0_181
+Check launcher:	C:\Program Files\Java\jre1.8.0_181\bin\javaw.exe (OK)
+Match:		1.008.000_181
+64-bit search:	SOFTWARE\JavaSoft\Java Development Kit...
+Check:		SOFTWARE\JavaSoft\Java Development Kit\1.8
+Ignore:		1.008.000
+Check:		SOFTWARE\JavaSoft\Java Development Kit\1.8.0_181
+Ignore:		1.008.000_181
+64-bit search:	SOFTWARE\JavaSoft\JRE...
+64-bit search:	SOFTWARE\JavaSoft\JDK...
+Runtime used:	1.008.000_181 (64-bit)
+Launcher:	C:\Program Files\Java\jre1.8.0_181\bin\javaw.exe
+Launcher args:	-jar "C:\Users\MecPalmo\Documents\Programowanie\Java\Ben10\Ben10.exe"
+Args length:	69/32768 chars
+Exit code:	0
